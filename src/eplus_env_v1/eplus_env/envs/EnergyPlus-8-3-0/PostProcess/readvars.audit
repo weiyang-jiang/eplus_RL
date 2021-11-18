@@ -1,0 +1,9 @@
+ ReadVarsESO
+ Requested Report Variable input file=eplusout.eso
+ does not exist.  Check eplusout.err file for possible explanations.
+ ReadVarsESO program terminated.
+ ReadVarsESO
+ processing:/home/weiyang/eplus_RL/A3C_data/Eplus-env-Part1-Light-Pit-Test-v1-res1/Eplus-env-sub_run18/output/eplusout.eso
+ Requested ESO file=Program Version,EnergyPlus, Version 8.3.0-6d97d074ea, YMD=2019.01.30 11:13
+ does not exist.  ReadVarsESO program terminated.
+ ReadVarsESO program terminated.

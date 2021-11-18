@@ -1,0 +1,127 @@
+  Processing Data Dictionary -- Complete
+  Maximum number of Alpha Args=        4500
+  Maximum number of Numeric Args=       21040
+  Number of Object Definitions=         741
+  Number of Section Definitions=           2
+  Total Number of Alpha Fields=       18234
+  Total Number of Numeric Fields=       39648
+  Total Number of Fields=       57882
+  Processing Input Data File -- Start
+  Echo of input lines is off. May be activated by setting the environmental variable DISPLAYINPUTINAUDIT=YES
+   ** Warning ** IP: IDF line~33211 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_1stFloor1stOpenNE = RdmNorm_StptOff_1stFloor1stOpenNE * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_1STFLOOR1STOPENNE = RDMNORM_STPTOFF_1STFLOOR1STOPENNE * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33212 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_1stFloor1stOpenNE = RdmNorm_StptOff_1stFloor1stOpenNE * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_1STFLOOR1STOPENNE = RDMNORM_STPTOFF_1STFLOOR1STOPENNE * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33215 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_1stFloor1stCls = RdmNorm_StptOff_1stFloor1stCls * SclStpt + BaseClsHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_1STFLOOR1STCLS = RDMNORM_STPTOFF_1STFLOOR1STCLS * SCLSTPT + BASECLSHTGSTPT
+   ** Warning ** IP: IDF line~33216 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_1stFloor1stCls = RdmNorm_StptOff_1stFloor1stCls * SclStpt + BaseClsClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_1STFLOOR1STCLS = RDMNORM_STPTOFF_1STFLOOR1STCLS * SCLSTPT + BASECLSCLGSTPT
+   ** Warning ** IP: IDF line~33219 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_1stFloor1stOpenNW = RdmNorm_StptOff_1stFloor1stOpenNW * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_1STFLOOR1STOPENNW = RDMNORM_STPTOFF_1STFLOOR1STOPENNW * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33220 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_1stFloor1stOpenNW = RdmNorm_StptOff_1stFloor1stOpenNW * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_1STFLOOR1STOPENNW = RDMNORM_STPTOFF_1STFLOOR1STOPENNW * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33223 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_1stFloor1stOpenNM = RdmNorm_StptOff_1stFloor1stOpenNM * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_1STFLOOR1STOPENNM = RDMNORM_STPTOFF_1STFLOOR1STOPENNM * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33224 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_1stFloor1stOpenNM = RdmNorm_StptOff_1stFloor1stOpenNM * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_1STFLOOR1STOPENNM = RDMNORM_STPTOFF_1STFLOOR1STOPENNM * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33227 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_1stFloor1stVol = RdmNorm_StptOff_1stFloor1stVol * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_1STFLOOR1STVOL = RDMNORM_STPTOFF_1STFLOOR1STVOL * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33228 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_1stFloor1stVol = RdmNorm_StptOff_1stFloor1stVol * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_1STFLOOR1STVOL = RDMNORM_STPTOFF_1STFLOOR1STVOL * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33231 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_1stFloor1stOpenSW = RdmNorm_StptOff_1stFloor1stOpenSW * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_1STFLOOR1STOPENSW = RDMNORM_STPTOFF_1STFLOOR1STOPENSW * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33232 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_1stFloor1stOpenSW = RdmNorm_StptOff_1stFloor1stOpenSW * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_1STFLOOR1STOPENSW = RDMNORM_STPTOFF_1STFLOOR1STOPENSW * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33235 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_1stFloor1stOpenSM = RdmNorm_StptOff_1stFloor1stOpenSM * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_1STFLOOR1STOPENSM = RDMNORM_STPTOFF_1STFLOOR1STOPENSM * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33236 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_1stFloor1stOpenSM = RdmNorm_StptOff_1stFloor1stOpenSM * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_1STFLOOR1STOPENSM = RDMNORM_STPTOFF_1STFLOOR1STOPENSM * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33239 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_1stFloor1stOpenSE = RdmNorm_StptOff_1stFloor1stOpenSE * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_1STFLOOR1STOPENSE = RDMNORM_STPTOFF_1STFLOOR1STOPENSE * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33240 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_1stFloor1stOpenSE = RdmNorm_StptOff_1stFloor1stOpenSE * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_1STFLOOR1STOPENSE = RDMNORM_STPTOFF_1STFLOOR1STOPENSE * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33243 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndOpenNE = RdmNorm_StptOff_2ndFloor2ndOpenNE * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDOPENNE = RDMNORM_STPTOFF_2NDFLOOR2NDOPENNE * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33244 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndOpenNE = RdmNorm_StptOff_2ndFloor2ndOpenNE * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDOPENNE = RDMNORM_STPTOFF_2NDFLOOR2NDOPENNE * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33247 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndCof02 = RdmNorm_StptOff_2ndFloor2ndCof02 * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDCOF02 = RDMNORM_STPTOFF_2NDFLOOR2NDCOF02 * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33248 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndCof02 = RdmNorm_StptOff_2ndFloor2ndCof02 * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDCOF02 = RDMNORM_STPTOFF_2NDFLOOR2NDCOF02 * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33251 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndOpenSW = RdmNorm_StptOff_2ndFloor2ndOpenSW * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDOPENSW = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSW * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33252 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndOpenSW = RdmNorm_StptOff_2ndFloor2ndOpenSW * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDOPENSW = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSW * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33255 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndOpenSMW = RdmNorm_StptOff_2ndFloor2ndOpenSMW * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDOPENSMW = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSMW * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33256 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndOpenSMW = RdmNorm_StptOff_2ndFloor2ndOpenSMW * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDOPENSMW = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSMW * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33259 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndOpenSM = RdmNorm_StptOff_2ndFloor2ndOpenSM * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDOPENSM = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSM * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33260 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndOpenSM = RdmNorm_StptOff_2ndFloor2ndOpenSM * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDOPENSM = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSM * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33263 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndOpenSE = RdmNorm_StptOff_2ndFloor2ndOpenSE * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDOPENSE = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSE * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33264 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndOpenSE = RdmNorm_StptOff_2ndFloor2ndOpenSE * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDOPENSE = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSE * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33267 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndOpenSME = RdmNorm_StptOff_2ndFloor2ndOpenSME * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDOPENSME = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSME * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33268 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndOpenSME = RdmNorm_StptOff_2ndFloor2ndOpenSME * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDOPENSME = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSME * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33271 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndCof01 = RdmNorm_StptOff_2ndFloor2ndCof01 * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDCOF01 = RDMNORM_STPTOFF_2NDFLOOR2NDCOF01 * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33272 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndCof01 = RdmNorm_StptOff_2ndFloor2ndCof01 * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDCOF01 = RDMNORM_STPTOFF_2NDFLOOR2NDCOF01 * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33275 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndOpenNMW = RdmNorm_StptOff_2ndFloor2ndOpenNMW * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDOPENNMW = RDMNORM_STPTOFF_2NDFLOOR2NDOPENNMW * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33276 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndOpenNMW = RdmNorm_StptOff_2ndFloor2ndOpenNMW * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDOPENNMW = RDMNORM_STPTOFF_2NDFLOOR2NDOPENNMW * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33279 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndOpenNW = RdmNorm_StptOff_2ndFloor2ndOpenNW * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDOPENNW = RDMNORM_STPTOFF_2NDFLOOR2NDOPENNW * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33280 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndOpenNW = RdmNorm_StptOff_2ndFloor2ndOpenNW * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDOPENNW = RDMNORM_STPTOFF_2NDFLOOR2NDOPENNW * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33283 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndOpenNME = RdmNorm_StptOff_2ndFloor2ndOpenNME * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDOPENNME = RDMNORM_STPTOFF_2NDFLOOR2NDOPENNME * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33284 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndOpenNME = RdmNorm_StptOff_2ndFloor2ndOpenNME * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDOPENNME = RDMNORM_STPTOFF_2NDFLOOR2NDOPENNME * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33287 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndCof03 = RdmNorm_StptOff_2ndFloor2ndCof03 * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDCOF03 = RDMNORM_STPTOFF_2NDFLOOR2NDCOF03 * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33288 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndCof03 = RdmNorm_StptOff_2ndFloor2ndCof03 * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDCOF03 = RDMNORM_STPTOFF_2NDFLOOR2NDCOF03 * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33291 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_2ndFloor2ndOpenSME1 = RdmNorm_StptOff_2ndFloor2ndOpenSME1 * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_2NDFLOOR2NDOPENSME1 = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSME1 * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33292 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_2ndFloor2ndOpenSME1 = RdmNorm_StptOff_2ndFloor2ndOpenSME1 * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_2NDFLOOR2NDOPENSME1 = RDMNORM_STPTOFF_2NDFLOOR2NDOPENSME1 * SCLSTPT + BASEOFFCLGSTPT
+   ** Warning ** IP: IDF line~33295 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneHeatingSetpoint_1stFloor1stCof = RdmNorm_StptOff_1stFloor1stCof * SclStpt + BaseOffHtgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONEHEATINGSETPOINT_1STFLOOR1STCOF = RDMNORM_STPTOFF_1STFLOOR1STCOF * SCLSTPT + BASEOFFHTGSTPT
+   ** Warning ** IP: IDF line~33296 Alpha Argument length exceeds maximum, will be truncated=    SET Set%ZoneCoolingSetpoint_1stFloor1stCof = RdmNorm_StptOff_1stFloor1stCof * SclStpt + BaseOffClgStp
+   **   ~~~   ** Will be processed as Alpha=SET SET%ZONECOOLINGSETPOINT_1STFLOOR1STCOF = RDMNORM_STPTOFF_1STFLOOR1STCOF * SCLSTPT + BASEOFFCLGSTPT
+  Processing Input Data File -- Complete
+  Maximum number of Alpha IDF Args=         146
+  Maximum number of Numeric IDF Args=          86
+  Number of IDF "Lines"=        2212
+  Number of Defaulted Fields=          74
+  Number of Fields with Defaults=        7142
+  Number of Autosized Fields=           5
+  Number of Autosizable Fields =         108
+  Number of Autocalculated Fields=         355
+  Number of Autocalculatable Fields =        2728
+ Getting object=VERSION
+ Getting object=HEATBALANCEALGORITHM
+ Getting object=TIMESTEP
+ Getting object=CONVERGENCELIMITS
+ Getting object=OUTPUT:DIAGNOSTICS
+ Getting object=OUTPUTCONTROL:REPORTINGTOLERANCES
+ Getting object=SIMULATIONCONTROL
+ Getting object=OUTPUT:SURFACES:DRAWING
+ Getting object=OUTPUT:VARIABLEDICTIONARY
+ Getting object=OUTPUT:ENERGYMANAGEMENTSYSTEM
+ Getting object=BRANCH
+ Getting object=CURVE:BIQUADRATIC
+ Getting object=CURVE:CUBIC
+ Getting object=CURVE:QUADRATIC
+ Getting object=CURVE:EXPONENT
+ Getting object=NODELIST
+ Getting object=BRANCHLIST
+ Getting object=DESIGNSPECIFICATION:OUTDOORAIR
+ Getting object=SCHEDULE:COMPACT
