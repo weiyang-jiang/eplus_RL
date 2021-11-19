@@ -26,65 +26,65 @@ class RunProfileTrain(object):
         self.env = self.args_make.env_interact_wrapper
         self.agent = agent(
             # Adam
-            visual_main_path=self.args_make.args_make.visual_main_path,
-            lr=self.args_make.args_make.lr,
-            adam_eps=self.args_make.args_make.adam_eps,
-            history_size=self.args_make.args_make.history_size,
+            visual_main_path=self.args_make.visual_main_path,
+            lr=self.args_make.lr,
+            adam_eps=self.args_make.adam_eps,
+            history_size=self.args_make.history_size,
 
             # noise
-            noise_net_std=self.args_make.args_make.noise_net_std,
+            noise_net_std=self.args_make.noise_net_std,
 
             # Q network
-            hidden_size=self.args_make.args_make.hidden_size,
+            hidden_size=self.args_make.hidden_size,
 
-            device=self.args_make.args_make.device,
-            gamma=self.args_make.args_make.gamma,
+            device=self.args_make.device,
+            gamma=self.args_make.gamma,
             
             # epsilon
             max_epsilon=1.0,
             min_epsilon=0.01,
-            epsilon_decay=self.args_make.args_make.epsilon_decay,
+            epsilon_decay=self.args_make.epsilon_decay,
             
-            env=self.args_make.env,
-            memory_size=self.args_make.args_make.memory_size,
-            batch_size=self.args_make.args_make.batch_size,
-            target_update=self.args_make.args_make.target_update,
+            env=self.env,
+            memory_size=self.args_make.memory_size,
+            batch_size=self.args_make.batch_size,
+            target_update=self.args_make.target_update,
 
-            raw_stateLimit_process_func=self.args_make.args_make.raw_stateLimit_process_func,
-            reward_func=self.args_make.args_make.reward_func,
-            action_func=self.args_make.args_make.train_action_func,
-            action_space=self.args_make.args_make.action_space,
-            action_limits=self.args_make.args_make.train_action_limits,
-            metric_func=self.args_make.args_make.metric_func,
+            raw_stateLimit_process_func=self.args_make.raw_stateLimit_process_func,
+            reward_func=self.args_make.reward_func,
+            action_func=self.args_make.train_action_func,
+            action_space=self.args_make.action_space,
+            action_limits=self.args_make.train_action_limits,
+            metric_func=self.args_make.metric_func,
 
-            RL_method=self.args_make.args_make.method,
+            RL_method=self.args_make.method,
 
             # test
-            state_dim=self.args_make.args_make.state_dim,
-            raw_state_process_func=self.args_make.args_make.raw_state_process_func,
+            state_dim=self.args_make.state_dim,
+            raw_state_process_func=self.args_make.raw_state_process_func,
 
             # PER parameters
-            alpha=self.args_make.args_make.alpha,
-            beta=self.args_make.args_make.beta,
-            prior_eps=self.args_make.args_make.prior_eps,
+            alpha=self.args_make.alpha,
+            beta=self.args_make.beta,
+            prior_eps=self.args_make.prior_eps,
 
             # Categorical 1_DQN_relpayBuffer_target parameters
-            v_min=self.args_make.args_make.v_min,
-            v_max=self.args_make.args_make.v_max,
-            atom_size=self.args_make.args_make.atom_size,
+            v_min=self.args_make.v_min,
+            v_max=self.args_make.v_max,
+            atom_size=self.args_make.atom_size,
 
             # N-step Learning
-            n_step=self.args_make.args_make.window_len,
+            n_step=self.args_make.window_len,
 
             # eplus-parameter
-            e_weight=self.args_make.args_make.e_weight,
-            p_weight=self.args_make.args_make.p_weight,
-            rewardArgs=self.args_make.args_make.rewardArgs,
+            e_weight=self.args_make.e_weight,
+            p_weight=self.args_make.p_weight,
+            rewardArgs=self.args_make.rewardArgs,
             output_file="./",
             is_add_time_to_state=True,
-            is_on_server=self.args_make.args_make.is_on_server,
-            test_envs=self.args_make.args_make.test_envs,
-            is_test=self.args_make.args_make.is_test
+            is_on_server=self.args_make.is_on_server,
+            test_envs=self.args_make.test_envs,
+            is_test=self.args_make.is_test
         )
 
 
