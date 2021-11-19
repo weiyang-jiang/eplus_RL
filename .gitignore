@@ -4,5 +4,6 @@ __pycache__/
 out.log
 Eplus-env-*-res*/
 visual/
+visual_test/
 main.log
 vdlrecords.*.log

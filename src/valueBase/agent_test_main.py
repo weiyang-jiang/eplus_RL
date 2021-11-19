@@ -50,13 +50,13 @@ class Agent_test(object):
             train_writer,
             resultParser,
             # Q network
-            train_env_name,
             str_time,
             visual_main_path,
             hidden_size,
 
             device,
             Train_dir,
+            model_path,
             env,
             raw_stateLimit_process_func,
             reward_func,
@@ -144,10 +144,9 @@ class Agent_test(object):
 
         # networks: dqn, dqn_target
         self.train_dir = Train_dir
-        self.model_path = os.path.join(os.path.join(Train_dir, "model"), "dqn.pth")
+        self.model_path = model_path
         self.visual_main_path = visual_main_path
         self.str_time = str_time
-        self.train_env_name = train_env_name
         self.resultParser = resultParser
 
         self.is_test = is_test
@@ -264,8 +263,7 @@ class Agent_test(object):
         return self.add_hparams_dict
 
     def _save_json(self, energy, comfort):
-        str_time = time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())
-        data_dir = os.path.join(self.train_dir, f"test_data/{str_time}_{self.env_name}_result")
+        data_dir = os.path.join(self.train_dir, f"test_data/{self.str_time}_{self.env_name}_result")
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
         with open(os.path.join(data_dir, "data.json"), "w", encoding="utf-8") as file:

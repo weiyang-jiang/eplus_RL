@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch import optim
-from valueBase.IL_PQN_v1.IL_network import IL_Network
+from valueBase.PQN.PQN_il_network import IL_Network
 from valueBase.util.IL_parse_data import IlParse
 from valueBase.customized.action_funcs import act_func_dict
 from valueBase.customized.actions import action_map
