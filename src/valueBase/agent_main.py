@@ -11,7 +11,6 @@ from tqdm import tqdm
 
 import gym
 
-
 import torch
 
 import torch.nn.functional as F
@@ -26,6 +25,7 @@ from valueBase.util.logger import Logger
 from valueBase.util.eps_scheduler import ActEpsilonScheduler
 from visualdl import LogWriter
 from valueBase.util.ResultEvaluation import ResultParser
+
 LOG_LEVEL = 'INFO'
 LOG_FMT = "[%(asctime)s] %(name)s %(levelname)s:%(message)s"
 
@@ -198,8 +198,6 @@ class AgentMain(object):
 
         self.is_on_server = is_on_server
 
-
-
         self.raw_state_process_func = raw_state_process_func
         self.state_dim = state_dim
         self.dir_path = self.env.model_path
@@ -211,9 +209,7 @@ class AgentMain(object):
             self.test_envs = test_envs
         self.test_envs.insert(0, self.env_name)
 
-
         self.visual_main_path = visual_main_path
-
 
         self.add_hparams_dict = {
             "Model Path": self.dir_path,
@@ -268,12 +264,11 @@ class AgentMain(object):
         self.alpha = alpha
         # noise
         self.noise_net_std = noise_net_std
-
+        self.model_path = os.path.join(os.path.join(self.dir_path, "model"), "dqn.pth")
         self.complie_agent()
 
     def complie_agent(self):
         self.Agent_test = Agent_test
-
 
     def complie_dqn(self):
         # networks: dqn, dqn_target
@@ -285,7 +280,6 @@ class AgentMain(object):
 
         # optimizer
         self.optimizer = optim.Adam(self.dqn.parameters(), lr=self.lr, eps=self.eps)
-
 
     def select_action(self, state: np.array) -> list:
         """Select an action from the input state."""
@@ -350,8 +344,6 @@ class AgentMain(object):
         for index, arg in enumerate(args):
             writer.add_scalar(tag=f"train/{metric_list[index]}", value=arg, step=num)
 
-
-
     def train(self, num_frames: int):
 
         """Train the agent."""
@@ -362,7 +354,6 @@ class AgentMain(object):
         self.complie_dqn()
         time_this, state, done = self.reset()  # 初始化环境参数
         update_cnt = 0
-
 
         # visual
         epoch = 1
@@ -379,7 +370,6 @@ class AgentMain(object):
             action = self.select_action(state)  # 输入state输出一个action
             iter_tqdm.set_description(f"{self.env_name}  cooling temp setpoint:{np.squeeze(action)}")
 
-
             self.transition = [state, action]  # 把当前的transition添加到列表当中去
 
             time_next, next_state_raw, done = self.env.step(action)  # 把预测出来的action代入到环境当中，得到下一步的状态和奖励
@@ -395,18 +385,16 @@ class AgentMain(object):
                                               self._e_weight, self._p_weight, *self.rewardArgs)
             score += this_ep_reward
 
-
-
             # visual
-            this_ep_energy, this_ep_comfort, iats, clgssp, htgssp = self.metric_func(next_state_raw, this_ep_energy, this_ep_comfort)
+            this_ep_energy, this_ep_comfort, iats, clgssp, htgssp = self.metric_func(next_state_raw, this_ep_energy,
+                                                                                     this_ep_comfort)
             list_current = ["Action", "Temperature"]
             self.write_data(self.train_writer, list_current, frame_idx,
                             action[0], iats)
 
-
             self.transition += [this_ep_reward, next_state, done]  # 将整体的一个小的transition存储到大的list当中
             self.memory.store(*self.transition)  # 这一步是将当前的transition存到buffer里面
-                # 一个transition中包含(state, selected_action, reward, next_state, done)
+            # 一个transition中包含(state, selected_action, reward, next_state, done)
 
             state = next_state
 
@@ -459,8 +447,6 @@ class AgentMain(object):
         self.save_model()
         self.env.close()
 
-
-
     def save_model(self):
         model_file_path = os.path.join(self.dir_path, "model")
         os.mkdir(model_file_path)
@@ -504,7 +490,6 @@ class AgentMain(object):
         # 这里直接把当前的q网络的参数赋值给target network 了
         self.dqn_target.load_state_dict(self.dqn.state_dict())
 
-
     def test(self):
         """Test the agent."""
         resultParser = ResultParser(self.dir_path)
@@ -523,18 +508,16 @@ class AgentMain(object):
 
             agent = self.Agent_test(
                 add_hparams_dict=self.add_hparams_dict,
-                # Q network
                 train_writer=self.train_writer,
-                is_test=self.is_test,
                 resultParser=resultParser,
-                train_env_name=self.env_name,
+
+                # Q network
                 str_time=self.str_time,
                 visual_main_path=self.visual_main_path,
-
-                noise_net_std=self.noise_net_std,
                 hidden_size=self.hidden_size,
 
                 device=self.device,
+                model_path=self.model_path,
                 Train_dir=self.dir_path,
                 env=env_interact_wrapper,
 
@@ -546,18 +529,23 @@ class AgentMain(object):
                 metric_func=self.metric_func,
                 method=self.method,
 
+                v_min=self.v_min,
+                v_max=self.v_max,
+                atom_size=self.atom_size,
+
                 # eplus-parameter
                 e_weight=self._e_weight,
                 p_weight=self._p_weight,
                 rewardArgs=self.rewardArgs,
                 output_file="./",
-                is_add_time_to_state=True
+                is_add_time_to_state=True,
+                is_show=False,
+                noise_net_std=self.noise_net_std,
+                is_test=self.is_test
             )
 
             self.add_hparams_dict = agent.test()
 
         self.train_writer.add_hparams(hparams_dict=self.add_hparams_dict,
-                           metrics_list=self.list_main)
+                                      metrics_list=self.list_main)
         self.train_writer.close()
-
-

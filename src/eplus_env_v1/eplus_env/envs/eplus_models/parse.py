@@ -5,7 +5,7 @@
 import json
 import os
 import glob
-main_path = "/home/weiyang/"
+main_path = "/home/guest_admin/"
 list = [main_path + "eplus_RL/src/eplus_env_v1/eplus_env/envs/eplus_models/rl_exp_part_1/idf/*",
         main_path + "eplus_RL/src/eplus_env_v1/eplus_env/envs/eplus_models/rl_exp_part_2/idf/*",
         main_path + "eplus_RL/src/eplus_env_v1/eplus_env/envs/eplus_models/rl_exp_part_3/idf/*",
@@ -21,4 +21,5 @@ for j in list:
         data = data.replace("/home/weiyang/", main_path)
         with open(i, "w", encoding = 'ISO-8859-1') as file:
             file.write(data)
+        print(i)
 

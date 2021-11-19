@@ -14,7 +14,7 @@ import glob
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from valueBase.IL_PQN_v1.IL_network import IL_Network
+from valueBase.PQN.PQN_il_network import IL_Network
 
 
 def behavioural_cloning_update(agent, expert_trajectories, agent_optimiser, batch_size):

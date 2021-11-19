@@ -95,11 +95,11 @@ class ResultParser(object):
         x = [i for i in range(len(env_list))]
         plt.figure(figsize=(20, 5), dpi=100)
         plt.subplot(121)
-        plt.title(f'{self.baseline_name[-3]} Energy Baseline Compare')
+        plt.title(f'{self.baseline_name} Energy Baseline Compare')
         plt.bar(x, energy_list, fc="r", tick_label=env_list)
 
         plt.subplot(122)
-        plt.title(f'{self.baseline_name[-3]} Comfort Baseline Compare')
+        plt.title(f'{self.baseline_name} Comfort Baseline Compare')
 
         total_width, n = 0.8, 2
         width = total_width / n

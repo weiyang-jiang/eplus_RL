@@ -30,7 +30,7 @@ from valueBase.noiseNet.agent import NoiseAgent
 from valueBase.category_DQN.agent import C51Agent
 from valueBase.rainbow.agent_v1 import Rainbow_Agent
 from valueBase.n_step_DQN.agent import Nstep_Agent
-from valueBase.run_profile import RunProfile
+from valueBase.run_profile import RunProfileTrain
 from valueBase.Dueling_network.agent_il_v1 import DuelingAgent_v1
 from valueBase.Dueling_network.agent_il_v2 import DuelingAgent_v2
 
@@ -81,7 +81,7 @@ def run():
     else:
         logging.error("RL method is not exists.")
         return
-    dir_path = RunProfile(agent=agent, args=args).run()
+    dir_path = RunProfileTrain(agent=agent, args=args).run()
     resultparser = ResultParser(dir_path)
     resultparser.plot_result()
 
