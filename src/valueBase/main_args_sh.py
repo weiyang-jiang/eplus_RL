@@ -65,7 +65,9 @@ def get_args():
     parser.add_argument('--atom_size', default=51, type=int,
                         help='Categorical 1_DQN_relpayBuffer_target parameters')
 
-    parser.add_argument('--window_len', default=35, type=int, help='N-step Learning.')
+    parser.add_argument('--window_len', default=35, type=int, help='The state stacking window length, default is 35')
+    parser.add_argument('--forecast_len', default=0, type=int, help='forecast_len')
+    parser.add_argument('--n_step', default=3, type=int, help='N-step Learning.')
 
     parser.add_argument('--is_on_server', default=True, type=bool, help='whether run on the shell')
 
@@ -124,7 +126,9 @@ class ArgsMake(object):
         self.state_dim = self._args.state_dim
         self.e_weight = self._args.e_weight
         self.p_weight = self._args.p_weight
+        self.n_step = self._args.n_step
         self.window_len = self._args.window_len
+        self.forecast_len = self._args.forecast_len
         self.test_envs = self._args.test_env
 
         if not is_test_env:

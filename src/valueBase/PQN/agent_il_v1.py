@@ -14,6 +14,7 @@ from tqdm import tqdm
 from valueBase.util.IL_parse_data import IlParse
 
 from valueBase.PQN.agent import PQNAgent
+from valueBase.util.PrioritizedReplayBuffer import PrioritizedReplayBuffer
 from valueBase.util.preprocessors import process_raw_state_cmbd
 
 
@@ -59,13 +60,18 @@ class IL_PQNAgent_v1(PQNAgent):
     def train(self, num_frames: int):
 
         """Train the agent."""
-
         self.add_hparams_dict["Number frames"] = num_frames
         self.train_writer = self.complie_visual()
-
+        time_this, state, done = self.reset()  # 初始化环境参数
+        hist_state = self.histProcessor. \
+            process_state_for_network(state)  # 2-D array
+        self.hist_state_dim = hist_state.shape[1]
+        self.memory = PrioritizedReplayBuffer(
+            self.hist_state_dim, self.memory_size, self.batch_size, self.alpha
+        )
         self.complie_dqn()
         self.load_expert()
-        time_this, state, done = self.reset()  # 初始化环境参数
+
         update_cnt = 0
 
         # visual
@@ -81,11 +87,11 @@ class IL_PQNAgent_v1(PQNAgent):
         # eplus
         iter_tqdm = tqdm(range(1, num_frames + 1))
         for frame_idx in iter_tqdm:  # 开启训练
-            action = self.select_action(state)  # 输入state输出一个action
+            action = self.select_action(hist_state)  # 输入state输出一个action
             iter_tqdm.set_description(f"{self.env_name}  cooling temp setpoint:{np.squeeze(action)}")
 
 
-            self.transition = [state, action]  # 把当前的transition添加到列表当中去
+            self.transition = [hist_state, action]  # 把当前的transition添加到列表当中去
 
             time_next, next_state_raw, done = self.env.step(action)  # 把预测出来的action代入到环境当中，得到下一步的状态和奖励
 
@@ -96,6 +102,8 @@ class IL_PQNAgent_v1(PQNAgent):
                                                 self.is_add_time_to_state)  # 1-D list
 
             # Process and normalize the raw observation
+            next_hist_state = self.histProcessor. \
+                process_state_for_network(next_state)  # 2-D array
 
             this_ep_reward = self.reward_func(state, action, next_state, self._pcd_state_limits,
                                               self._e_weight, self._p_weight, *self.rewardArgs)
@@ -115,7 +123,7 @@ class IL_PQNAgent_v1(PQNAgent):
             self.memory.store(*self.transition)  # 这一步是将当前的transition存到buffer里面
                 # 一个transition中包含(state, selected_action, reward, next_state, done)
 
-            state = next_state
+            hist_state = next_hist_state
 
             fraction = min(frame_idx / num_frames, 1.0)
             self.beta = self.beta + fraction * (1.0 - self.beta)
@@ -129,6 +137,9 @@ class IL_PQNAgent_v1(PQNAgent):
                 self.inmitation_step = 0
                 self.inmitation_epoch += 1
                 time_this, state, done = self.reset()  # 初始化环境参数
+                self.histProcessor.reset()
+                hist_state = self.histProcessor. \
+                    process_state_for_network(state)  # 2-D array
                 scores.append(score)
                 score = 0
 

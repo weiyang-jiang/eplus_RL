@@ -8,6 +8,9 @@
 import os
 from typing import Tuple
 
+import h5py
+
+import eplus_env
 import gym
 import numpy as np
 import pandas as pd
@@ -19,7 +22,7 @@ from valueBase.customized.action_funcs import act_func_dict
 from valueBase.customized.actions import action_map
 from valueBase.customized.raw_state_processors import raw_state_process_map
 from valueBase.env_interaction import IWEnvInteract
-from valueBase.util.preprocessors import process_raw_state_cmbd
+from valueBase.util.preprocessors import process_raw_state_cmbd, HistoryPreprocessor
 from valueBase.util.logger import Logger
 
 LOG_LEVEL = 'INFO'
@@ -71,6 +74,9 @@ class IL_learning(object):
             gamma=0.99,
             output_file="./",
             is_add_time_to_state=True,
+            window_len=35,
+            forecast_len=0,
+            prcdState_dim=1,
     ):
         """Initialization.
 
@@ -141,7 +147,7 @@ class IL_learning(object):
 
         # mode: train / test
 
-
+        self.histProcessor = HistoryPreprocessor(window_len, forecast_len, prcdState_dim)
 
         self.raw_state_process_func = raw_state_process_func
         self.state_dim = state_dim
@@ -150,13 +156,14 @@ class IL_learning(object):
 
         il = IlParse(path)
         self.expert_actions = il.parse_csv(path_name)
-
-        self.h5 = pd.HDFStore(f'./data/{self.env_name}.h5', 'w', complevel=4, complib='blosc')
+        if not os.path.exists("./data_expert"):
+            os.mkdir("./data_expert")
+        self.h5 = h5py.File(f'./data_expert/{self.env_name}_{window_len}.h5', 'w')
 
     def complie_dqn(self):
         # networks: dqn, dqn_target
 
-        self.dqn = IL_Network(self.obs_dim, self.action_dim, self.hidden_size).to(self.device)
+        self.dqn = IL_Network(self.hist_state_dim, self.action_dim, self.hidden_size).to(self.device)
         # optimizer
         self.optimizer = optim.Adam(self.dqn.parameters(), lr=self.lr, eps=self.eps)
 
@@ -196,31 +203,24 @@ class IL_learning(object):
 
         return time_next, next_state, done
 
-    def update_model(self) -> torch.Tensor:
-        """Update the model by gradient descent."""
-        samples = self.memory.sample_batch()  # 在buffer里面随机抽取batch_size个transition
 
-        loss = self.compute_dqn_loss(samples)
-
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
-
-        return loss.item()
 
 
     def train(self):
 
         """Train the agent."""
-        state_DF = pd.DataFrame()
-        action_DF = pd.DataFrame()
+        state_DF = []
+        action_DF = []
 
         for epoch in range(1, 6):
-
+            self._local_logger.info(f"{epoch} epoch is starting")
             time_this, state, done = self.reset()  # 初始化环境参数
+            hist_state = self.histProcessor. \
+                process_state_for_network(state)  # 2-D array
+            self.hist_state_dim = hist_state.shape[1]
 
-            state_DF = state_DF.append([state])
-            action_DF = action_DF.append([20])
+            state_DF.append(hist_state.tolist())
+            action_DF.append([20])
             self.inmitation_step = 0
             # eplus
 
@@ -228,9 +228,11 @@ class IL_learning(object):
                 action, action_idx = self.select_action(state)  # 输入state输出一个action
 
                 time_next, next_state, done = self.step(action)  # 把预测出来的action代入到环境当中，得到下一步的状态和奖励
+                next_hist_state = self.histProcessor. \
+                    process_state_for_network(next_state)  # 2-D array
 
-                state_DF = state_DF.append([next_state])
-                action_DF = action_DF.append(action_idx)
+                state_DF.append(next_hist_state.tolist())
+                action_DF.append(action_idx)
                 self.inmitation_step += 1
 
                 # visual
@@ -245,15 +247,11 @@ class IL_learning(object):
                     break
 
         self.env.close()
-
-        self.h5["state"] = state_DF
-        self.h5["action"] = action_DF
+        self.h5.create_dataset('state', data=np.array(state_DF))
+        self.h5.create_dataset('action', data=np.array(action_DF))
         self.h5.close()
 
-    def save_model(self):
-        model_file_path = os.path.join(self.dir_path, "model")
-        os.mkdir(model_file_path)
-        torch.save(self.dqn.state_dict(), os.path.join(model_file_path, 'dqn.pth'))
+
 
 
 

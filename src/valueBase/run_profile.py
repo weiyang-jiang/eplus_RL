@@ -11,6 +11,7 @@ from visualdl import LogWriter
 
 from valueBase.main_args_sh import *
 from valueBase.util.ResultEvaluation import ResultParser
+from valueBase.util.preprocessors import HistoryPreprocessor
 
 
 def seed_torch(seed):
@@ -74,7 +75,11 @@ class RunProfileTrain(object):
             atom_size=self.args_make.atom_size,
 
             # N-step Learning
-            n_step=self.args_make.window_len,
+            n_step=self.args_make.n_step,
+
+            # multi-state
+            window_len=self.args_make.window_len,
+            forecast_len=self.args_make.forecast_len,
 
             # eplus-parameter
             e_weight=self.args_make.e_weight,
@@ -84,7 +89,8 @@ class RunProfileTrain(object):
             is_add_time_to_state=True,
             is_on_server=self.args_make.is_on_server,
             test_envs=self.args_make.test_envs,
-            is_test=self.args_make.is_test
+            is_test=self.args_make.is_test,
+
         )
 
 
@@ -131,6 +137,7 @@ class RunProfileTest(object):
         resultParser = ResultParser(self.dir_path)
         test_envs = [self.train_env_name] + self.args_make.test_envs
         iter_tqdm = tqdm(test_envs)
+        histProcessor = HistoryPreprocessor(self.args_make.window_len, 0, 1)
         for test_env in iter_tqdm:
             iter_tqdm.set_description(f"{test_env}")
             spec = gym.spec(test_env)
@@ -163,7 +170,12 @@ class RunProfileTest(object):
                 action_limits=self.args_make.train_action_limits,
                 metric_func=self.args_make.metric_func,
                 method=self.args_make.method,
-    
+
+                # multi-state
+                window_len=self.args_make.window_len,
+                forecast_len=self.args_make.forecast_len,
+                prcdState_dim=1,
+
                 v_min=self.args_make.v_min,
                 v_max=self.args_make.v_max,
                 atom_size=self.args_make.atom_size,
