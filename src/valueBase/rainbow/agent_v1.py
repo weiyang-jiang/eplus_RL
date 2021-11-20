@@ -5,8 +5,6 @@
 
 import os, sys, glob
 
-from valueBase.util.ResultEvaluation import ResultParser
-from valueBase.env_interaction import IWEnvInteract
 from valueBase.rainbow.agent_v1_test import Rainbow_Agent_test
 
 srcPath = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -37,18 +35,6 @@ class Rainbow_Agent(AgentMain):
     
     def complie_agent(self):
         self.Agent_test = Rainbow_Agent_test
-
-        # PER
-        # memory for 1-step Learning
-        self.memory = PrioritizedReplayBuffer(
-            self.obs_dim, self.memory_size, self.batch_size, alpha=self.alpha
-        )
-
-        # memory for N-step Learning
-        self.memory_n = ReplayBuffer(
-            self.obs_dim, self.memory_size, self.batch_size, n_step=self.n_step, gamma=self.gamma
-        )
-
         # Categorical 1_DQN_relpayBuffer_target parameters
         self.support = torch.linspace(
             self.v_min, self.v_max, self.atom_size
@@ -60,14 +46,14 @@ class Rainbow_Agent(AgentMain):
         self.add_hparams_dict["v_min"] = self.v_min
         self.add_hparams_dict["v_max"] = self.v_max
         self.add_hparams_dict["atom_size"] = self.atom_size
-        self.add_hparams_dict["window_len"] = self.n_step
+        self.add_hparams_dict["n_step"] = self.n_step
 
     def complie_dqn(self):
         self.dqn = Network(
-            self.obs_dim, self.action_dim, self.atom_size, self.hidden_size, self.noise_net_std, self.support
+            self.hist_state_dim, self.action_dim, self.atom_size, self.hidden_size, self.noise_net_std, self.support
         ).to(self.device)
         self.dqn_target = Network(
-            self.obs_dim, self.action_dim, self.atom_size, self.hidden_size, self.noise_net_std, self.support
+            self.hist_state_dim, self.action_dim, self.atom_size, self.hidden_size, self.noise_net_std, self.support
         ).to(self.device)
         self.dqn_target.load_state_dict(self.dqn.state_dict())
         self.dqn_target.eval()
@@ -144,14 +130,25 @@ class Rainbow_Agent(AgentMain):
         """Train the agent."""
 
 
-        # visual
         self.add_hparams_dict["Number frames"] = num_frames
         self.train_writer = self.complie_visual()
-
-        self.complie_dqn()
         time_this, state, done = self.reset()  # 初始化环境参数
-        update_cnt = 0
+        hist_state = self.histProcessor. \
+            process_state_for_network(state)  # 2-D array
+        self.hist_state_dim = hist_state.shape[1]
+        # PER
+        # memory for 1-step Learning
+        self.memory = PrioritizedReplayBuffer(
+            self.hist_state_dim, self.memory_size, self.batch_size, alpha=self.alpha
+        )
 
+        # memory for N-step Learning
+        self.memory_n = ReplayBuffer(
+            self.hist_state_dim, self.memory_size, self.batch_size, n_step=self.n_step, gamma=self.gamma
+        )
+        self.complie_dqn()
+
+        update_cnt = 0
         # visual
         epoch = 1
         score = 0
@@ -164,19 +161,19 @@ class Rainbow_Agent(AgentMain):
         # eplus
         iter_tqdm = tqdm(range(1, num_frames + 1))
         for frame_idx in iter_tqdm:  # 开启训练
-            action = self.select_action(state)  # 输入state输出一个action
+            action = self.select_action(hist_state)  # 输入state输出一个action
             iter_tqdm.set_description(f"{self.env_name}  cooling temp setpoint:{np.squeeze(action)}")
 
-
-            self.transition = [state, action]  # 把当前的transition添加到列表当中去
+            self.transition = [hist_state, action]  # 把当前的transition添加到列表当中去
 
             time_next, next_state_raw, done = self.env.step(action)  # 把预测出来的action代入到环境当中，得到下一步的状态和奖励
-
             next_state = process_raw_state_cmbd(next_state_raw, [time_next],
                                                 self._env_st_yr, self._env_st_mn,
                                                 self._env_st_dy, self._env_st_wd,
                                                 self._pcd_state_limits,
                                                 self.is_add_time_to_state)  # 1-D list
+            next_hist_state = self.histProcessor. \
+                process_state_for_network(next_state)  # 2-D array
 
             # Process and normalize the raw observation
 
@@ -193,7 +190,7 @@ class Rainbow_Agent(AgentMain):
 
 
 
-            self.transition += [this_ep_reward, next_state, done]  # 将整体的一个小的transition存储到大的list当中
+            self.transition += [this_ep_reward, next_hist_state, done]  # 将整体的一个小的transition存储到大的list当中
             # N-step transition
 
             one_step_transition = self.memory_n.store(*self.transition)
@@ -202,7 +199,7 @@ class Rainbow_Agent(AgentMain):
             if one_step_transition:
                 self.memory.store(*one_step_transition)
 
-            state = next_state
+            hist_state = next_hist_state
 
             fraction = min(frame_idx / num_frames, 1.0)
             self.beta = self.beta + fraction * (1.0 - self.beta)
@@ -214,6 +211,9 @@ class Rainbow_Agent(AgentMain):
             # if episode ends
             if done:
                 time_this, state, done = self.reset()  # 初始化环境参数
+                self.histProcessor.reset()
+                hist_state = self.histProcessor. \
+                    process_state_for_network(state)  # 2-D array
                 scores.append(score)
                 score = 0
 

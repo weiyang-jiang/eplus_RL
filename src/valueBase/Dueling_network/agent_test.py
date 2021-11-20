@@ -12,6 +12,6 @@ class Dueling_Agent_test(Agent_test):
 
     def complie_dqn(self):
         # networks: dqn, dqn_target
-        self.dqn = Dueling_Network(self.obs_dim, self.action_dim, self.hidden_size).to(self.device)
+        self.dqn = Dueling_Network(self.hist_dim, self.action_dim, self.hidden_size).to(self.device)
         self.dqn.load_state_dict(torch.load(self.model_path))
 

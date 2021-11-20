@@ -20,7 +20,7 @@ from valueBase.agent_test_main import Agent_test
 from valueBase.util.network import Network
 from valueBase.util.replaybuffer import *
 from valueBase.env_interaction import IWEnvInteract
-from valueBase.util.preprocessors import process_raw_state_cmbd
+from valueBase.util.preprocessors import process_raw_state_cmbd, HistoryPreprocessor
 from valueBase.util.logger import Logger
 from valueBase.util.eps_scheduler import ActEpsilonScheduler
 from visualdl import LogWriter
@@ -49,6 +49,7 @@ class AgentMain(object):
         transition (list): transition information including
                            state, action, reward, next_state, done
     """
+
 
     def __init__(
             self,
@@ -91,7 +92,7 @@ class AgentMain(object):
             v_max: float = 200.0,
             atom_size: int = 51,
             # N-step Learning
-            n_step: int = 42,
+            n_step: int = 3,
 
             max_epsilon=1.0,
             min_epsilon=0.01,
@@ -102,7 +103,11 @@ class AgentMain(object):
             output_file="./",
             is_add_time_to_state=True,
             is_on_server=True,
-            is_test=False
+            is_test=False,
+            window_len=35,
+            forecast_len=0,
+            prcdState_dim=1,
+
 
     ):
         """Initialization.
@@ -162,7 +167,6 @@ class AgentMain(object):
                                                 LOG_LEVEL, LOG_FMT, output_file + '/main.log')
         self._local_logger.info('Evaluation worker starts!')
 
-        self.memory = ReplayBuffer(self.obs_dim, self.memory_size, batch_size)
         """
         在经验回放中，需要将所有的transition存储到buffer里面，然后这个buffer有一个memory_size，
         每一次要计算TD-target的时候都要随机挑选batch_size个transition，然后进行求解。
@@ -198,6 +202,11 @@ class AgentMain(object):
 
         self.is_on_server = is_on_server
 
+        self.window_len = window_len
+        self.forecast_len = forecast_len
+        self.prcdState_dim = prcdState_dim
+        self.histProcessor = HistoryPreprocessor(window_len, forecast_len, prcdState_dim)
+
         self.raw_state_process_func = raw_state_process_func
         self.state_dim = state_dim
         self.dir_path = self.env.model_path
@@ -219,6 +228,8 @@ class AgentMain(object):
             "learning rate": self.lr,
             "Adam eps": self.eps,
             "Noise net std": None,
+            "window_len": self.window_len,
+            "prcdState_dim": self.prcdState_dim,
             "History size": self.history_size,
             "Hidden layer size": self.hidden_size,
             "device": self.device_name,
@@ -241,7 +252,7 @@ class AgentMain(object):
             "v_min": None,
             "v_max": None,
             "atom_size": None,
-            "window_len": None,
+            "n_step": None,
             "seed": None,
             "is_on_server": True
         }
@@ -270,11 +281,11 @@ class AgentMain(object):
     def complie_agent(self):
         self.Agent_test = Agent_test
 
+
     def complie_dqn(self):
         # networks: dqn, dqn_target
-
-        self.dqn = Network(self.obs_dim, self.action_dim, self.hidden_size).to(self.device)
-        self.dqn_target = Network(self.obs_dim, self.action_dim, self.hidden_size).to(self.device)
+        self.dqn = Network(self.hist_state_dim, self.action_dim, self.hidden_size).to(self.device)
+        self.dqn_target = Network(self.hist_state_dim, self.action_dim, self.hidden_size).to(self.device)
         self.dqn_target.load_state_dict(self.dqn.state_dict())
         self.dqn_target.eval()
 
@@ -309,6 +320,7 @@ class AgentMain(object):
                                        self._env_st_yr, self._env_st_mn,
                                        self._env_st_dy, self._env_st_wd,
                                        self._pcd_state_limits, self.is_add_time_to_state)  # 1-D list
+
         return time_this, state, done
 
     def step(self, action: list) -> Tuple[np.ndarray, np.float64, bool]:
@@ -348,11 +360,16 @@ class AgentMain(object):
 
         """Train the agent."""
 
+
         self.add_hparams_dict["Number frames"] = num_frames
         self.train_writer = self.complie_visual()
-
-        self.complie_dqn()
         time_this, state, done = self.reset()  # 初始化环境参数
+        hist_state = self.histProcessor. \
+            process_state_for_network(state)  # 2-D array
+        self.hist_state_dim = hist_state.shape[1]
+        self.memory = ReplayBuffer(self.hist_state_dim, self.memory_size, self.batch_size)
+        self.complie_dqn()
+
         update_cnt = 0
 
         # visual
@@ -367,10 +384,10 @@ class AgentMain(object):
         # eplus
         iter_tqdm = tqdm(range(1, num_frames + 1))
         for frame_idx in iter_tqdm:  # 开启训练
-            action = self.select_action(state)  # 输入state输出一个action
+            action = self.select_action(hist_state)  # 输入state输出一个action
             iter_tqdm.set_description(f"{self.env_name}  cooling temp setpoint:{np.squeeze(action)}")
 
-            self.transition = [state, action]  # 把当前的transition添加到列表当中去
+            self.transition = [hist_state, action]  # 把当前的transition添加到列表当中去
 
             time_next, next_state_raw, done = self.env.step(action)  # 把预测出来的action代入到环境当中，得到下一步的状态和奖励
             next_state = process_raw_state_cmbd(next_state_raw, [time_next],
@@ -378,7 +395,8 @@ class AgentMain(object):
                                                 self._env_st_dy, self._env_st_wd,
                                                 self._pcd_state_limits,
                                                 self.is_add_time_to_state)  # 1-D list
-
+            next_hist_state = self.histProcessor. \
+                process_state_for_network(next_state)  # 2-D array
             # Process and normalize the raw observation
 
             this_ep_reward = self.reward_func(state, action, next_state, self._pcd_state_limits,
@@ -392,11 +410,11 @@ class AgentMain(object):
             self.write_data(self.train_writer, list_current, frame_idx,
                             action[0], iats)
 
-            self.transition += [this_ep_reward, next_state, done]  # 将整体的一个小的transition存储到大的list当中
+            self.transition += [this_ep_reward, next_hist_state, done]  # 将整体的一个小的transition存储到大的list当中
             self.memory.store(*self.transition)  # 这一步是将当前的transition存到buffer里面
             # 一个transition中包含(state, selected_action, reward, next_state, done)
 
-            state = next_state
+            hist_state = next_hist_state
 
             # visual
             comfort_total_eps += this_ep_comfort
@@ -405,6 +423,10 @@ class AgentMain(object):
             # if episode ends
             if done:
                 time_this, state, done = self.reset()  # 初始化环境参数
+                self.histProcessor.reset()
+                hist_state = self.histProcessor. \
+                    process_state_for_network(state)  # 2-D array
+
                 scores.append(score)
                 score = 0
 
@@ -528,6 +550,10 @@ class AgentMain(object):
                 action_limits=self.action_limits,
                 metric_func=self.metric_func,
                 method=self.method,
+
+                window_len=self.window_len,
+                forecast_len=self.forecast_len,
+                prcdState_dim=self.prcdState_dim,
 
                 v_min=self.v_min,
                 v_max=self.v_max,

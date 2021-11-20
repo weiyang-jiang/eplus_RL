@@ -22,7 +22,7 @@ class C51_Agent_test(Agent_test):
 
     def complie_dqn(self):
         self.dqn = Network(
-            self.obs_dim, self.action_dim, self.atom_size, self.hidden_size, self.support
+            self.hist_dim, self.action_dim, self.atom_size, self.hidden_size, self.support
         ).to(self.device)
         self.dqn.load_state_dict(torch.load(self.model_path))
 

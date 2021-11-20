@@ -4,6 +4,7 @@
 """
 import os
 
+import h5py
 import torch
 from torch import optim
 from torch.utils import data
@@ -37,11 +38,12 @@ class IL_dataset(data.Dataset):
     def __init__(self):
         self.state = []
         self.action = []
-        hd5_list = glob.glob("./data/*.h5")
+        hd5_list = glob.glob("./data_expert/*.h5")
+
         for hd5_path in hd5_list:
-            h5 = pd.HDFStore(hd5_path, "r")
-            state = list(np.array(h5.get("state")))
-            action = list(np.array(h5.get("action")))
+            h5 = h5py.File(hd5_path, "r")
+            state = list(np.squeeze(h5["state"]))
+            action = list(np.array(h5["action"]))
             self.state.extend(state)
             self.action.extend(action)
             h5.close()
@@ -54,15 +56,17 @@ class IL_dataset(data.Dataset):
     def __len__(self):
         return len(self.state)
 
-def save_model(dqn):
+def save_model(dqn, window_len):
     model_file_path = os.path.join("./expert_model")
-    os.mkdir(model_file_path)
-    torch.save(dqn.state_dict(), os.path.join(model_file_path, 'expert_dqn.pth'))
+    if not os.path.exists(model_file_path):
+        os.mkdir(model_file_path)
+    torch.save(dqn.state_dict(), os.path.join(model_file_path, f'expert_dqn_{window_len}.pth'))
 
 if __name__ == '__main__':
+    window_len = 35
     ilDateset = IL_dataset()
-    device = torch.device("cuda")
-    agent = IL_Network(73, 25, 128).to(device)
+    device = torch.device("cpu")
+    agent = IL_Network(73*window_len, 25, 128).to(device)
     agent_optimiser = optim.RMSprop(agent.parameters(), lr=3.0e-05, alpha=0.9)
-    behavioural_cloning_update(agent, ilDateset, agent_optimiser, 16)
-    save_model(agent)
+    behavioural_cloning_update(agent, ilDateset, agent_optimiser, batch_size=2)
+    save_model(agent, window_len)

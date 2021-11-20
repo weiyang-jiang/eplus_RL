@@ -10,9 +10,12 @@ dir_list_main = glob.glob("*")
 for dir_list_small in dir_list_main:
     if os.path.isfile(dir_list_small):
        continue
-    num_list = glob.glob(f"{dir_list_small}/*")
+    num_list = glob.glob(f"{dir_list_small}/*/")
+    num_list += glob.glob(f"{dir_list_small}/*/*/")
     for sh_file in num_list:
-        path = glob.glob(f"{sh_file}/*.sh")
+        path = glob.glob(f"{sh_file}/run.sh")
+        if path == []:
+            continue
         with open(path[0], "r") as file:
             # print(file.read())
 
@@ -65,25 +68,28 @@ for dir_list_small in dir_list_main:
                 "rewardArgs": float(dict_data.get("violation_penalty_scl", 10.0)),
 
                 "#################################": "################################",
-                "memory_size": 40,
-                "batch_size": 32,
-                "target_update": 100,
-                "gamma": 0.99,
+                "memory_size": int(dict_data.get("memory_size", 100000)),
+                "batch_size": int(dict_data.get("batch_size", 32)),
+                "target_update": int(dict_data.get("target_update", 2000)),
+                "gamma": float(dict_data.get("gamma", 0.99)),
                 "##################### PER parameter": "###############################",
                 "alpha": 0.2,
                 "beta": 0.6,
                 "prior_eps": 1e-6,
                 "###### Categorical 1_DQN_relpayBuffer_target parameters": "###########",
-                "v_min": 0.0,
-                "v_max": 200.0,
-                "atom_size": 51,
+                "v_min": float(dict_data.get("v_min", -10.0)),
+                "v_max": float(dict_data.get("v_max", 10.0)),
+                "atom_size": int(dict_data.get("atom_size", 51)),
                 "############################### N-step Learning": "###################",
-                "window_len": int(dict_data.get("window_len", 4)),
+                "window_len": int(dict_data.get("window_len", 35)),
+                "forecast_len": 0,
+                "n_step": int(dict_data.get("n_step", 3)),
 
                 "############################### train parameter": "###################",
-                "num_frames": 1000000,
+                "num_frames": int(dict_data.get("num_frames", 1500000)),
                 "seed": 777,
-                "is_on_server": True
+                "is_on_server": True,
+                "is_test": dict_data.get("is_test", 'False'),
             }
             file.write(json.dumps(dict, ensure_ascii=False, indent=4))
             print("已经将信息写入"+json_path)

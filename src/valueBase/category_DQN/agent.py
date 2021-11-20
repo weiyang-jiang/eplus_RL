@@ -28,8 +28,8 @@ class C51Agent(AgentMain):
 
     def complie_dqn(self):
         # networks: dqn, dqn_target
-        self.dqn = Network(self.obs_dim, self.action_dim, self.atom_size, self.hidden_size, self.support).to(self.device)
-        self.dqn_target = Network(self.obs_dim, self.action_dim, self.atom_size, self.hidden_size, self.support).to(self.device)
+        self.dqn = Network(self.hist_state_dim, self.action_dim, self.atom_size, self.hidden_size, self.support).to(self.device)
+        self.dqn_target = Network(self.hist_state_dim, self.action_dim, self.atom_size, self.hidden_size, self.support).to(self.device)
         self.dqn_target.load_state_dict(self.dqn.state_dict())
         self.dqn_target.eval()
         # optimizer

@@ -14,7 +14,7 @@ import torch
 
 
 from valueBase.util.network import Network
-from valueBase.util.preprocessors import process_raw_state_cmbd
+from valueBase.util.preprocessors import process_raw_state_cmbd, HistoryPreprocessor
 from valueBase.util.logger import Logger
 
 LOG_LEVEL = 'INFO'
@@ -66,6 +66,10 @@ class Agent_test(object):
             metric_func,
             method,
 
+            window_len=35,
+            forecast_len=0,
+            prcdState_dim=1,
+
             v_min: float = 0.0,
             v_max: float = 200.0,
             atom_size: int = 51,
@@ -111,10 +115,15 @@ class Agent_test(object):
         self._raw_state_limits = np.transpose(np.copy(env_state_limits))
         self.is_add_time_to_state = is_add_time_to_state
         self.obs_dim = env.observation_space.shape[0]
+
         if self.is_add_time_to_state == True:
             env_state_limits.insert(0, (0, 23))  # Add hour limit
             env_state_limits.insert(0, (0, 6))  # Add weekday limit
             self.obs_dim += 2
+
+        self.histProcessor = HistoryPreprocessor(window_len, forecast_len, prcdState_dim)
+
+
         # reward
         self.reward_func = reward_func
         self.rewardArgs = rewardArgs
@@ -163,7 +172,7 @@ class Agent_test(object):
 
     def complie_dqn(self):
         # networks: dqn, dqn_target
-        self.dqn = Network(self.obs_dim, self.action_dim, self.hidden_size).to(self.device)
+        self.dqn = Network(self.hist_dim, self.action_dim, self.hidden_size).to(self.device)
         self.dqn.load_state_dict(torch.load(self.model_path))
 
     def select_action(self, state: np.array) -> list:
@@ -213,10 +222,11 @@ class Agent_test(object):
     def test(self):
         """Train the agent."""
 
-        self.complie_dqn()
-
-
         time_this, state, done = self.reset()  # 初始化环境参数
+        hist_state = self.histProcessor. \
+            process_state_for_network(state)  # 2-D array
+        self.hist_dim = hist_state.shape[1]
+        self.complie_dqn()
 
         energy_total = 0
         comfort_total = 0
@@ -229,7 +239,7 @@ class Agent_test(object):
         # eplus
         frame_idx = 1
         while not done:
-            action = self.select_action(state)
+            action = self.select_action(hist_state)
             # eplus
             time_next, next_state_raw, done = self.env.step(action)  # 把预测出来的action代入到环境当中，得到下一步的状态和奖励
             next_state = process_raw_state_cmbd(next_state_raw, [time_next],
@@ -237,6 +247,8 @@ class Agent_test(object):
                                                 self._env_st_dy, self._env_st_wd,
                                                 self._pcd_state_limits,
                                                 self.is_add_time_to_state)  # 1-D list
+            next_hist_state = self.histProcessor. \
+                process_state_for_network(next_state)  # 2-D array
             this_ep_reward = self.reward_func(state, action, next_state, self._pcd_state_limits,
                                               self._e_weight, self._p_weight, *self.rewardArgs)
 
@@ -246,7 +258,7 @@ class Agent_test(object):
 
             comfort_total += this_ep_comfort
             energy_total += this_ep_energy
-            state = next_state
+            hist_state = next_hist_state
 
             frame_idx += 1
             if self.is_test and frame_idx >= 100:
@@ -257,6 +269,7 @@ class Agent_test(object):
         list_current = ["Energy Total", "Energy Baseline", "Temperature Not Met", "Temperature Not Met Baseline"]
         self.write_data(list_current,
                          energy_total, energy_Baseline, comfort_total, comfort_baseline)
+        self.histProcessor.reset()
         self._save_json(energy_total, comfort_total)
         self._local_logger.info(f"{self.env_name} energy:{energy_total} comfort:{comfort_total}")
         self.env.close()
