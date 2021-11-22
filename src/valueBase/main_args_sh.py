@@ -81,6 +81,7 @@ def get_args():
     parser.add_argument('--reward_func', default='cslDxCool_1', type=str)
     parser.add_argument('--metric_func', default='cslDxCool_1', type=str)
     parser.add_argument('--raw_state_process_func', default='cslDx_1', type=str)
+    parser.add_argument('--feature', default=None, type=str)
 
     return parser
 
@@ -91,10 +92,11 @@ class ArgsMake(object):
         # Prepare case specific args
         self._args = args
         self.method = self._args.method.upper()
+        self.feature = self._args.feature
         self.visual_main_path = self._args.visual_main_path
         if not is_test_env:
             spec = gym.spec(self._args.env)
-            self._env = spec.make(method=self.method)
+            self._env = spec.make(method=self.feature)
 
         self.is_test = self._args.is_test
         self.lr = self._args.lr

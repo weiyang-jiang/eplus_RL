@@ -26,6 +26,7 @@ class RunProfileTrain(object):
         self.args_make = ArgsMake(args, is_test_env=False)
         self.env = self.args_make.env_interact_wrapper
         self.agent = agent(
+            feature=self.args_make.feature,
             # Adam
             visual_main_path=self.args_make.visual_main_path,
             lr=self.args_make.lr,
@@ -105,6 +106,7 @@ class RunProfileTrain(object):
 class RunProfileTest(object):
     def __init__(self, agent, args, str_time, dir_path, model_path, visual_path, model_name, save_path):
         self.args_make = ArgsMake(args, is_test_env=True)
+        self.feature = self.args_make.feature
         self.train_env_name = args.env
         self.dir_path = dir_path
         self.model_path = model_path
@@ -129,15 +131,14 @@ class RunProfileTest(object):
         }
 
     def complie_visual(self, model):
-        visual_path = self.visual_main_path + f"/visual_test/{model}/{self.str_time}_run"
-        writer = LogWriter(visual_path)
+        visual_path = self.visual_main_path + f"/visual_test/{model}/{self.str_time}_{self.feature}_run"
+        writer = LogWriter(visual_path, display_name=self.feature)
         return writer
 
     def run(self):
         resultParser = ResultParser(self.dir_path)
         test_envs = [self.train_env_name] + self.args_make.test_envs
         iter_tqdm = tqdm(test_envs)
-        histProcessor = HistoryPreprocessor(self.args_make.window_len, 0, 1)
         for test_env in iter_tqdm:
             iter_tqdm.set_description(f"{test_env}")
             spec = gym.spec(test_env)

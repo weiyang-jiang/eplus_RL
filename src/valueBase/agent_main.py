@@ -7,6 +7,7 @@ import os
 import time
 from typing import Tuple
 
+import pandas as pd
 from tqdm import tqdm
 
 import gym
@@ -54,6 +55,7 @@ class AgentMain(object):
     def __init__(
             self,
             # Adam
+            feature,
             visual_main_path,
             lr,
             adam_eps,
@@ -127,7 +129,7 @@ class AgentMain(object):
             p_weight=1.0, reward_para The penalty weight on comfort.
 
         """
-
+        self.feature = feature
         self.action_dim = env.action_space.n  # 表示动作action是几个的
         self._env_st_yr = env.start_year
         self._env_st_mn = env.start_mon
@@ -221,15 +223,13 @@ class AgentMain(object):
         self.visual_main_path = visual_main_path
 
         self.add_hparams_dict = {
+            "feature": self.feature,
             "Model Path": self.dir_path,
             "Reward function": self.reward_func.__name__,
             "Metric function": self.metric_func.__name__,
-            "Number frames": None,
+            "Number frames": "None",
             "learning rate": self.lr,
             "Adam eps": self.eps,
-            "Noise net std": None,
-            "window_len": self.window_len,
-            "prcdState_dim": self.prcdState_dim,
             "History size": self.history_size,
             "Hidden layer size": self.hidden_size,
             "device": self.device_name,
@@ -245,16 +245,19 @@ class AgentMain(object):
             "Batch size": self.batch_size,
             "target update": self.target_update,
             "epsilon": epsilon_decay,
-            "gamma": None,
-            "alpha": None,
-            "beta": None,
-            "prior_eps": None,
-            "v_min": None,
-            "v_max": None,
-            "atom_size": None,
-            "n_step": None,
-            "seed": None,
-            "is_on_server": True
+            "gamma": self.gamma,
+            "alpha": "None",
+            "beta": "None",
+            "prior_eps": "None",
+            "v_min": "None",
+            "v_max": "None",
+            "atom_size": "None",
+            "n_step": "None",
+            "seed": "None",
+            "is_on_server": "True",
+            "Noise net std": "None",
+            "window_len": self.window_len,
+            "prcdState_dim": self.prcdState_dim
         }
         self.str_time = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
         self.is_test = is_test
@@ -348,8 +351,8 @@ class AgentMain(object):
         return loss.item()
 
     def complie_visual(self):
-        visual_path = self.visual_main_path + f"/visual/{self.env_name}/{self.method}/{self.str_time}_run"
-        writer = LogWriter(visual_path)
+        visual_path = self.visual_main_path + f"/visual/{self.env_name}/{self.method}/{self.str_time}_{self.feature}_run"
+        writer = LogWriter(visual_path,  display_name=self.feature)
         return writer
 
     def write_data(self, writer, metric_list, num, *args):
@@ -512,6 +515,15 @@ class AgentMain(object):
         # 这里直接把当前的q网络的参数赋值给target network 了
         self.dqn_target.load_state_dict(self.dqn.state_dict())
 
+    def save_csv(self):
+        import shutil
+        values_data = [f"{i}" for i in self.add_hparams_dict.values()]
+        str_data = ",".join(values_data).replace("nan", "").replace("[[", '"[[').replace("]]", ']]"')
+        with open(os.path.dirname(self.visual_main_path) + "/Q_learning_data/QLearnData.csv", "a") as f:
+            f.write("\r\n" + str_data)
+        shutil.copy(os.path.dirname(self.visual_main_path) + "/Q_learning_data/QLearnData.csv",
+                    os.path.dirname(self.visual_main_path) + "/Q_learning_data/QLearnData_copy.csv")
+
     def test(self):
         """Test the agent."""
         resultParser = ResultParser(self.dir_path)
@@ -572,6 +584,9 @@ class AgentMain(object):
 
             self.add_hparams_dict = agent.test()
 
+
         self.train_writer.add_hparams(hparams_dict=self.add_hparams_dict,
                                       metrics_list=self.list_main)
         self.train_writer.close()
+
+        self.save_csv()
