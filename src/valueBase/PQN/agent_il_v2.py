@@ -15,7 +15,7 @@ from valueBase.PQN.agent import PQNAgent
 class IL_PQNAgent_v2(PQNAgent):
 
     def complie_dqn(self):
-        self.expert_dqn = os.path.join(self.visual_main_path + "/valueBase/PQN/expert_model/expert_dqn.pth")
+        self.expert_dqn = os.path.join(self.visual_main_path + "/valueBase/util/expert_model/PQN_expert_dqn_35.pth")
         # networks: dqn, dqn_target
         self.dqn = IL_Network(self.hist_state_dim, self.action_dim, self.hidden_size).to(self.device)
         self.dqn.load_state_dict(torch.load(self.expert_dqn, map_location=torch.device("cpu")))
