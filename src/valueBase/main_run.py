@@ -44,6 +44,10 @@ def run():
     args = parser.parse_args()
     method = args.method.upper()
 
+    if args.feature == None:
+        logging.info(f"You did not prepare feature, using {args.method} as substitute feature")
+        args.feature = args.method
+
     if args.is_test.upper() == "FALSE":
         args.is_test = False
     elif args.is_test.upper() == "TRUE":
