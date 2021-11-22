@@ -115,7 +115,7 @@ class ResultParser(object):
 
 
 if __name__ == '__main__':
-    model_type = "PQN"
+    model_type = "dueling"
     model_type = model_type.upper()
-    res = ResultParser("/home/weiyang/eplus_RL/Q_learning_data/QLearnData_copy.csv", model_type)
+    res = ResultParser("/home/weiyang/eplus_RL/Q_learning_data/DuelingData.csv", model_type)
     res.plot_result()
