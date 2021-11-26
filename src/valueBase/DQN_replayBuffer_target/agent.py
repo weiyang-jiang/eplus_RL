@@ -3,9 +3,9 @@
    @Date: 2021-11-05 09:21:04
 """
 
-from valueBase.agent_main import AgentMain
+from valueBase.Asyn_agent_main import AsynAgentMain
 
 
-class DQNAgent(AgentMain):
+class AsynDQNAgent(AsynAgentMain):
     pass
 

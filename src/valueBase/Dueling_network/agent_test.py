@@ -5,7 +5,7 @@
 import torch
 
 from valueBase.Dueling_network.duelingNetwork import Dueling_Network
-from valueBase.agent_test_main import Agent_test
+from valueBase.Asyn_agent_test_main import Agent_test
 
 
 class Dueling_Agent_test(Agent_test):

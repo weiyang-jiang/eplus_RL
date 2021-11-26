@@ -36,6 +36,8 @@ for dir_list_small in dir_list_main:
         json_path = sh_file + "/run_value.json"
         with open(json_path, "w", encoding="utf-8") as file:
             dict = {
+                "feature": dict_data.get("feature", dict_data["method"]),
+                "process_raw_state_cmbd": dict_data.get("process_raw_state_cmbd", "part1_v1"),
                 "lr": float(dict_data.get("lr", 6.5e-05)),
                 "adam_eps": float(dict_data.get("adam_eps", 0.00015)),
                 "noise_net_std": float(dict_data.get("noise_net_std", 0.5)),

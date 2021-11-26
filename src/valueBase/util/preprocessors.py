@@ -122,6 +122,88 @@ def process_raw_state_cmbd(raw_state, simTime, start_year, start_mon,
     return state_after_2
 
 
+def process_raw_state_cmbd_state_v1(raw_state, simTime, start_year, start_mon,
+                                    start_date, start_day, min_max_limits, is_add_time_to_state):
+    """
+    Process the raw state by calling process_raw_state_1 and process_raw_state_2
+    in order.
+
+    Args:
+        raw_state: python list, 1-D or 2-D
+            The raw observation from the environment. It can be only one
+            sample (1-D) or multiple samples (2-D, where each row is a sample).
+        simTime: python list, 1-D
+            Delta seconds from the start time, each item in the list
+            corresponds to a row in the state.
+        start_year: int
+            Start year.
+        start_mon: int
+            Start month.
+        start_date: int.
+            The day of the month at the start time.
+        start_day: int
+            The start weekday. 0 is Monday and 6 is Sunday.
+        min_max_limits: python list, 2-D, 2*m where m is the number of state
+                        features
+            The minimum and maximum possible values for each state feature.
+            The first row is the minimum values and the second row is the maximum
+            values.
+
+    Return: python list, 1-D or 2-D
+        Processed min-max normalized (0 to 1) state It can be only one sample
+        (1-D) or multiple samples (2-D, where each row is a sample).
+        State feature order:
+
+    """
+
+    TIMESTATE_LEN = 0
+    ZONE_NUM = 22
+    IAT_FIRST_RAW_IDX = 4
+    CLGSSP_FIRST_RAW_IDX = 26
+    HTGSSP_FIRST_RAW_IDX = 48
+    ENERGY_RAW_IDX = 70
+    ret = raw_state[TIMESTATE_LEN: IAT_FIRST_RAW_IDX+TIMESTATE_LEN]
+    iats = np.array(
+        raw_state[TIMESTATE_LEN + IAT_FIRST_RAW_IDX: TIMESTATE_LEN + IAT_FIRST_RAW_IDX + ZONE_NUM])
+    clgssp = np.array(
+        raw_state[TIMESTATE_LEN + CLGSSP_FIRST_RAW_IDX: TIMESTATE_LEN + CLGSSP_FIRST_RAW_IDX + ZONE_NUM])
+    htgssp = np.array(
+        raw_state[TIMESTATE_LEN + HTGSSP_FIRST_RAW_IDX: TIMESTATE_LEN + HTGSSP_FIRST_RAW_IDX + ZONE_NUM])
+    energy = raw_state[TIMESTATE_LEN + ENERGY_RAW_IDX]
+    ret.extend([min(iats), float(np.mean(iats)), max(iats)])
+    ret.extend([min(clgssp), float(np.mean(clgssp)), max(clgssp)])
+    ret.extend([min(htgssp), float(np.mean(htgssp)), max(htgssp)])
+    ret.extend([energy])
+    TIMESTATE_LEN = 2
+    ret_limit = []
+    for i in range(2):
+        ret_limit_first = list(min_max_limits[i][0:IAT_FIRST_RAW_IDX+TIMESTATE_LEN])
+        iats = min_max_limits[i][TIMESTATE_LEN + IAT_FIRST_RAW_IDX + 1:TIMESTATE_LEN + IAT_FIRST_RAW_IDX + 4]
+        clgssp = min_max_limits[i][TIMESTATE_LEN + CLGSSP_FIRST_RAW_IDX + 1:TIMESTATE_LEN + CLGSSP_FIRST_RAW_IDX + 4]
+        htgssp = min_max_limits[i][TIMESTATE_LEN + HTGSSP_FIRST_RAW_IDX + 1:TIMESTATE_LEN + HTGSSP_FIRST_RAW_IDX + 4]
+        energy = min_max_limits[i][TIMESTATE_LEN + ENERGY_RAW_IDX]
+        ret_limit_first.extend(iats.tolist())
+        ret_limit_first.extend(clgssp.tolist())
+        ret_limit_first.extend(htgssp.tolist())
+        ret_limit_first.extend([energy])
+        ret_limit.append(ret_limit_first)
+    if is_add_time_to_state:
+        state_after_1 = process_raw_state_1(simTime, ret, start_year, start_mon,
+                                            start_date, start_day)
+    else:
+        state_after_1 = copy.deepcopy(ret)
+
+    state_after_2 = process_raw_state_2(state_after_1, ret_limit)
+
+    return state_after_2
+
+
+process_raw_state_cmbd_map = {
+    "part1_v1": process_raw_state_cmbd,
+    "part1_state_v1": process_raw_state_cmbd_state_v1
+}
+
+
 class HistoryPreprocessor:
     """Keeps the last k states.
 

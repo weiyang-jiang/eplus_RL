@@ -10,12 +10,12 @@ import torch
 import torch.nn.functional as F
 
 
-from valueBase.agent_main import AgentMain
+from valueBase.Asyn_agent_main import AsynAgentMain
 
 
 
 
-class DDQNAgent(AgentMain):
+class AsynDDQNAgent(AsynAgentMain):
 
     def compute_dqn_loss(self, samples: Dict[str, np.ndarray]) -> torch.Tensor:
         """Return dqn loss."""

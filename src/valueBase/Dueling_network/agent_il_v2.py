@@ -8,12 +8,12 @@ import torch
 
 from torch import optim
 
-from valueBase.Dueling_network.agent import DuelingAgent
+from valueBase.Dueling_network.agent import AsynDuelingAgent
 from valueBase.Dueling_network.duelingNetwork import Dueling_Network
 
 
 
-class DuelingAgent_v2(DuelingAgent):
+class DuelingAgent_v2(AsynDuelingAgent):
 
     def complie_dqn(self):
         self.expert_dqn = os.path.join(self.visual_main_path + "/valueBase/util/expert_model/Dueling_expert_dqn_35.pth")

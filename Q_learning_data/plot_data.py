@@ -28,14 +28,15 @@ class ResultParser(object):
             else:
                 if self.model_type in feature.upper():
                     self.features.append(feature)
-                    test_list.append(list(data.loc[index, "Part1-Light-Pit-Train-v1/Energy Total":"Part1-Light-Pit-Test-v4/Temperature Not Met Baseline"]))
-        test_data = pd.DataFrame(np.array(test_list), columns=data.loc[:, "Part1-Light-Pit-Train-v1/Energy Total":"Part1-Light-Pit-Test-v4/Temperature Not Met Baseline"].columns)
+                    test_list.append(list(data.loc[index,
+                                          "Part1-Light-Pit-Train-v1/Energy Total":"Part1-Light-Pit-Test-v4/Temperature Not Met Baseline"]))
+        test_data = pd.DataFrame(np.array(test_list), columns=data.loc[:,
+                                                              "Part1-Light-Pit-Train-v1/Energy Total":"Part1-Light-Pit-Test-v4/Temperature Not Met Baseline"].columns)
         self.number = len(test_data.index)
         energy_total = pd.DataFrame()
         energy_baseline = pd.DataFrame()
         comfort_total = pd.DataFrame()
         comfort_baseline = pd.DataFrame()
-
 
         for str_name in test_data.columns:
             if "Energy Total" in str_name:
@@ -48,7 +49,8 @@ class ResultParser(object):
                 comfort_total = comfort_total.append(test_data.loc[:, str_name])
         self.energy_total = energy_total.T
         self.energy_baseline = energy_baseline.T
-        self.energy_saving = 100 * (np.array(self.energy_baseline) - np.array(self.energy_total)) / np.array(self.energy_baseline)
+        self.energy_saving = 100 * (np.array(self.energy_baseline) - np.array(self.energy_total)) / np.array(
+            self.energy_baseline)
         self.comfort_total = comfort_total
         self.comfort_baseline = np.array(comfort_baseline.iloc[:, 0])
         self.comfort_total[self.number] = self.comfort_baseline
@@ -60,10 +62,10 @@ class ResultParser(object):
     def add_text(self, x, y):
         for a, b in zip(x, y):
             if b < 0:
-                new_b = b - float(np.clip(8/self.number, 1, 2.5))
+                new_b = b - float(np.clip(8 / self.number, 1, 2.5))
             else:
                 new_b = b + 0.05
-            plt.text(a, new_b, '%.0f' % b, ha='center', va='bottom', fontsize=float(np.clip(40/self.number, 5, 10)))
+            plt.text(a, new_b, '%.0f' % b, ha='center', va='bottom', fontsize=float(np.clip(40 / self.number, 5, 10)))
 
     def plot_one_img(self, energy_saving, features, env_list):
         x = [i for i in range(len(env_list))]
@@ -85,8 +87,7 @@ class ResultParser(object):
         img_dir = os.path.join(os.path.dirname(self.working_dir), "Baseline_compare")
         if not os.path.exists(img_dir):
             os.makedirs(img_dir)
-    #
-    # #     """Plot the training progresses."""
+        #     """Plot the training progresses."""
 
         plt.figure(figsize=(20, 5), dpi=300)
         plt.subplot(121)
@@ -95,7 +96,7 @@ class ResultParser(object):
         plt.ylabel("Energy saving (%)")
         plt.legend(loc="best")
 
-    #
+        #
         plt.subplot(122)
         plt.title(f'{self.model_type} Comfort Baseline Compare')
         comfort_sum = self.comfort_total
@@ -106,16 +107,9 @@ class ResultParser(object):
         plt.savefig(img_dir + f"/{self.model_type}_Energy_comfort_compare.png")
         plt.show()
 
-    #
-    #     plt.bar(x, comfort_list, fc="g", width=width, label="Comfort Not Met(hrs)", tick_label=env_list)
-    #     for i in x:
-    #         x[i] = x[i] + width
-    #     plt.bar(x, comfort_baseline_list, fc="r", width=width, label="Baseline(hrs)")
-    #     plt.legend()
-
 
 if __name__ == '__main__':
-    model_type = "dueling"
+    model_type = "rainbow"
     model_type = model_type.upper()
-    res = ResultParser("/home/weiyang/eplus_RL/Q_learning_data/DuelingData.csv", model_type)
+    res = ResultParser("/home/weiyang/eplus_RL/Q_learning_data/QLearnData_copy.csv", model_type)
     res.plot_result()

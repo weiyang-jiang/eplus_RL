@@ -968,6 +968,98 @@ def stpt_viol_energy_reward_part1_weiyang_v1(ob_this_prcd, action_this_prcd, ob_
     # Shift reward to 0 ~ 1
     return ret
 
+def stpt_viol_energy_reward_part1_weiyang_state_v1(ob_this_prcd, action_this_prcd, ob_next_prcd, pcd_state_limits, e_weight, p_weight,
+                                     stpt_violation_scl):
+    """
+    Get the reward from hvac energy and indoor air temperature setpoint violation level (the max one
+    is used for the multi-zone case).
+    reward = [- p * (scl * (max_htgssp_viol + max_clgssp_viol)) - e * energy]_{limit:0,-1} + 1
+
+    Args:
+        ob_next_prcd:
+            Processed observation.
+        e_weight: float
+            The weight to HVAC energy consumption.
+        p_weight: float
+            The weight to indoor air temperature setpoint violation.
+        ppd_penalty_limit:
+
+    Return: float
+        The reward.
+    """
+    ZONE_NUM = 3
+    IAT_FIRST_RAW_IDX = 4
+    CLGSSP_FIRST_RAW_IDX = 7
+    HTGSSP_FIRST_RAW_IDX = 10
+    ENERGY_RAW_IDX = 13
+    normalized_iats = np.array(
+        ob_next_prcd[TIMESTATE_LEN + IAT_FIRST_RAW_IDX: TIMESTATE_LEN + IAT_FIRST_RAW_IDX + ZONE_NUM])
+    normalized_clgssp = np.array(
+        ob_next_prcd[TIMESTATE_LEN + CLGSSP_FIRST_RAW_IDX: TIMESTATE_LEN + CLGSSP_FIRST_RAW_IDX + ZONE_NUM])
+    normalized_htgssp = np.array(
+        ob_next_prcd[TIMESTATE_LEN + HTGSSP_FIRST_RAW_IDX: TIMESTATE_LEN + HTGSSP_FIRST_RAW_IDX + ZONE_NUM])
+    normalized_clgssp_viol_max = max(
+        normalized_iats - normalized_clgssp)  # For cooling, the IAT should be less than the CLGSSP
+    normalized_htgssp_viol_max = max(
+        normalized_htgssp - normalized_iats)  # For heating, the IAT should be larger than the HTGSSP
+    normalized_energy = ob_next_prcd[TIMESTATE_LEN + ENERGY_RAW_IDX]
+
+    energy_rwd = float(np.clip(normalized_energy, 0, 1).astype(np.float))
+
+    comfort_rwd = (max(normalized_clgssp_viol_max, 0) + max(normalized_htgssp_viol_max,
+                                                            0)) * stpt_violation_scl
+    comfort_rwd = float(np.clip(comfort_rwd, 0, 1).astype(np.float))
+    # Penalty for the positive setpoint violation
+    energy_rwd = 1 - math.pow(energy_rwd, 0.4)
+    comfort_rwd = 1 - math.pow(comfort_rwd, 0.4)
+    ret = e_weight * energy_rwd + p_weight * comfort_rwd  # Limit to 0 ~ -1
+    # Shift reward to 0 ~ 1
+    return ret
+
+def stpt_viol_energy_reward_part1_state_v1(ob_this_prcd, action_this_prcd, ob_next_prcd, pcd_state_limits, e_weight, p_weight,
+                                     stpt_violation_scl):
+    """
+    Get the reward from hvac energy and indoor air temperature setpoint violation level (the max one
+    is used for the multi-zone case).
+    reward = [- p * (scl * (max_htgssp_viol + max_clgssp_viol)) - e * energy]_{limit:0,-1} + 1
+
+    Args:
+        ob_next_prcd:
+            Processed observation.
+        e_weight: float
+            The weight to HVAC energy consumption.
+        p_weight: float
+            The weight to indoor air temperature setpoint violation.
+        ppd_penalty_limit:
+
+    Return: float
+        The reward.
+    """
+    ZONE_NUM = 3
+    IAT_FIRST_RAW_IDX = 4
+    CLGSSP_FIRST_RAW_IDX = 7
+    HTGSSP_FIRST_RAW_IDX = 10
+    ENERGY_RAW_IDX = 13
+    normalized_iats = np.array(
+        ob_next_prcd[TIMESTATE_LEN + IAT_FIRST_RAW_IDX: TIMESTATE_LEN + IAT_FIRST_RAW_IDX + ZONE_NUM])
+    normalized_clgssp = np.array(
+        ob_next_prcd[TIMESTATE_LEN + CLGSSP_FIRST_RAW_IDX: TIMESTATE_LEN + CLGSSP_FIRST_RAW_IDX + ZONE_NUM])
+    normalized_htgssp = np.array(
+        ob_next_prcd[TIMESTATE_LEN + HTGSSP_FIRST_RAW_IDX: TIMESTATE_LEN + HTGSSP_FIRST_RAW_IDX + ZONE_NUM])
+    normalized_clgssp_viol_max = max(
+        normalized_iats - normalized_clgssp)  # For cooling, the IAT should be less than the CLGSSP
+    normalized_htgssp_viol_max = max(
+        normalized_htgssp - normalized_iats)  # For heating, the IAT should be larger than the HTGSSP
+    normalized_energy = ob_next_prcd[TIMESTATE_LEN + ENERGY_RAW_IDX]
+
+    energy_rwd = - normalized_energy
+    comfort_rwd = - (max(normalized_clgssp_viol_max, 0) + max(normalized_htgssp_viol_max,
+                                                              0)) * stpt_violation_scl
+    # Penalty for the positive setpoint violation
+    ret = max(min(e_weight * energy_rwd + p_weight * comfort_rwd, 0.0), -1.0)  # Limit to 0 ~ -1
+    # Shift reward to 0 ~ 1
+    ret += 1.0
+    return ret
 
 def stpt_viol_energy_reward_part2_v1(ob_this_prcd, action_this_prcd, ob_next_prcd, pcd_state_limits, e_weight, p_weight,
                                      stpt_violation_scl):
@@ -2176,6 +2268,8 @@ reward_func_dict = {'1': err_energy_reward_iw,
                     'cslDxCool_1': stptVio_energy_reward_cslDxCool_v1,
                     'cslDxCool_2': stptVio_energy_reward_cslDxCool_v2,
                     'part1_v1': stpt_viol_energy_reward_part1_v1,
+                    'part1_state_v1': stpt_viol_energy_reward_part1_state_v1,
+                    'part1_weiyang_state_v1': stpt_viol_energy_reward_part1_weiyang_state_v1,
                     'part1_weiyang_v1': stpt_viol_energy_reward_part1_weiyang_v1,
                     'part2_v1': stpt_viol_energy_reward_part2_v1,
                     'part3_v1': rl_parametric_reward_part3_v1,

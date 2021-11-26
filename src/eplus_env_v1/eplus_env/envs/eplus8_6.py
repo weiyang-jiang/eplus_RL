@@ -61,14 +61,14 @@ class EplusEnv(Env):
                  min_max_limits, incl_forecast = False, forecastRandMode = 'normal', forecastRandStd = 0.15,
                  forecastSource = 'tmy3', forecastFilePath = None, forecast_hour = 12, act_repeat = 1,
                  max_ep_data_store_num=5, method="rainbow", train_dir_path=None):
-        self._env_name = env_name;
+        self._env_name = env_name
         self.method = method
-        self._thread_name = threading.current_thread().getName();
+        self._thread_name = threading.current_thread().getName()
         self.logger_main = Logger().getLogger('EPLUS_ENV_%s_%s_ROOT'%(env_name, self._thread_name), 
-                                            LOG_LEVEL_MAIN, LOG_FMT);
+                                            LOG_LEVEL_MAIN, LOG_FMT)
         
         # Set the environment variable for bcvtb
-        os.environ['BCVTB_HOME'] = bcvtb_path;
+        os.environ['BCVTB_HOME'] = bcvtb_path
         
         # Create a socket for communication with the EnergyPlus
         self.logger_main.debug('Creating socket for communication...')
@@ -92,7 +92,7 @@ class EplusEnv(Env):
         self._weather_path = weather_path
         self._variable_path = variable_path
         self._idf_path = idf_path
-        self._episode_existed = False;
+        self._episode_existed = False
         (self._eplus_run_st_mon, self._eplus_run_st_day,
          self._eplus_run_ed_mon, self._eplus_run_ed_day,
          self._eplus_run_st_weekday,

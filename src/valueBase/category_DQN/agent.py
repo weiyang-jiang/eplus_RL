@@ -3,21 +3,23 @@
    @Date: 2021-11-05 14:22:16
 """
 from typing import Dict
-import eplus_env
+
 import numpy as np
 import torch
-from valueBase.agent_main import AgentMain
+from valueBase.Asyn_agent_main import AgentMain, AsynAgentMain
 import torch.optim as optim
 from valueBase.category_DQN.agent_test import C51_Agent_test
 from valueBase.category_DQN.C51Network import Network
+from valueBase.util.replaybuffer import ReplayBuffer
 
 
-
-class C51Agent(AgentMain):
+class AsynC51Agent(AsynAgentMain):
 
 
     def complie_agent(self):
         self.Agent_test = C51_Agent_test
+        self.agent = AgentMain
+        self.memory = ReplayBuffer(self.hist_state_dim, self.memory_size, self.batch_size)
         self.support = torch.linspace(
             self.v_min, self.v_max, self.atom_size
         ).to(self.device)  # 生成从v_min到v_max的atom_size的等差数列
@@ -34,8 +36,6 @@ class C51Agent(AgentMain):
         self.dqn_target.eval()
         # optimizer
         self.optimizer = optim.Adam(self.dqn.parameters(), lr=self.lr, eps=self.eps)
-
-
 
 
     def compute_dqn_loss(self, samples: Dict[str, np.ndarray]) -> torch.Tensor:

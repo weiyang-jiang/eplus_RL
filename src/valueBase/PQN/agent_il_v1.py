@@ -13,12 +13,12 @@ from tqdm import tqdm
 
 from valueBase.util.IL_parse_data import IlParse
 
-from valueBase.PQN.agent import PQNAgent
+from valueBase.PQN.agent import AsynPQNAgent
 from valueBase.util.PrioritizedReplayBuffer import PrioritizedReplayBuffer
-from valueBase.util.preprocessors import process_raw_state_cmbd
 
 
-class IL_PQNAgent_v1(PQNAgent):
+
+class IL_PQNAgent_v1(AsynPQNAgent):
 
     def load_expert(self):
         csv_path = os.path.join(os.path.dirname(self.visual_main_path) + "/A3C_data")
@@ -95,7 +95,7 @@ class IL_PQNAgent_v1(PQNAgent):
 
             time_next, next_state_raw, done = self.env.step(action)  # 把预测出来的action代入到环境当中，得到下一步的状态和奖励
 
-            next_state = process_raw_state_cmbd(next_state_raw, [time_next],
+            next_state = self.process_raw_state_cmbd(next_state_raw, [time_next],
                                                 self._env_st_yr, self._env_st_mn,
                                                 self._env_st_dy, self._env_st_wd,
                                                 self._pcd_state_limits,

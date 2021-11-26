@@ -8,11 +8,10 @@ import torch
 
 from torch import optim
 from valueBase.PQN.PQN_il_network import IL_Network
-from valueBase.PQN.agent import PQNAgent
+from valueBase.PQN.agent import AsynPQNAgent
 
 
-
-class IL_PQNAgent_v2(PQNAgent):
+class IL_PQNAgent_v2(AsynPQNAgent):
 
     def complie_dqn(self):
         self.expert_dqn = os.path.join(self.visual_main_path + "/valueBase/util/expert_model/PQN_expert_dqn_35.pth")
