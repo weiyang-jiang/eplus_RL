@@ -20,16 +20,16 @@ for src_path in src_list:
 
 from main_args_sh import get_args
 from valueBase.util.Evaluation import ResultParser
-from valueBase.DQN_replayBuffer_target.agent import DQNAgent
-from valueBase.DDQN_replayBuffer_target.agent import DDQNAgent
-from valueBase.PQN.agent import PQNAgent
+from valueBase.DQN_replayBuffer_target.agent import AsynDQNAgent
+from valueBase.DDQN_replayBuffer_target.agent import AsynDDQNAgent
+from valueBase.PQN.agent import AsynPQNAgent
 from valueBase.PQN.agent_il_v1 import IL_PQNAgent_v1
 from valueBase.PQN.agent_il_v2 import IL_PQNAgent_v2
-from valueBase.Dueling_network.agent import DuelingAgent
-from valueBase.noiseNet.agent import NoiseAgent
-from valueBase.category_DQN.agent import C51Agent
-from valueBase.rainbow.agent_v1 import Rainbow_Agent
-from valueBase.n_step_DQN.agent import Nstep_Agent
+from valueBase.Dueling_network.agent import AsynDuelingAgent
+from valueBase.noiseNet.agent import AsynNoiseAgent
+from valueBase.category_DQN.agent import AsynC51Agent
+from valueBase.rainbow.agent_v1 import AsynRainbow_Agent
+from valueBase.n_step_DQN.agent import AsynNstep_Agent
 from valueBase.run_profile import RunProfileTrain
 from valueBase.Dueling_network.agent_il_v1 import DuelingAgent_v1
 from valueBase.Dueling_network.agent_il_v2 import DuelingAgent_v2
@@ -57,23 +57,28 @@ def run():
     else:
         args.is_test = False
 
-
+    if args.is_shuffle_envs.upper() == "FALSE":
+        args.is_shuffle_envs = False
+    elif args.is_shuffle_envs.upper() == "TRUE":
+        args.is_shuffle_envs = True
+    else:
+        args.is_shuffle_envs = False
     if method == "DQN":
-        agent = DQNAgent
+        agent = AsynDQNAgent
     elif method == "DDQN":
-        agent = DDQNAgent
+        agent = AsynDDQNAgent
     elif method == "PQN":
-        agent = PQNAgent
+        agent = AsynPQNAgent
     elif method == "DUELING":
-        agent = DuelingAgent
+        agent = AsynDuelingAgent
     elif method == "NOISE":
-        agent = NoiseAgent
+        agent = AsynNoiseAgent
     elif method == "C51":
-        agent = C51Agent
+        agent = AsynC51Agent
     elif method == "NSTEP":
-        agent = Nstep_Agent
+        agent = AsynNstep_Agent
     elif method == "RAINBOW":
-        agent = Rainbow_Agent
+        agent = AsynRainbow_Agent
     elif method == "ILPQNV1":
         agent = IL_PQNAgent_v1
     elif method == "ILPQNV2":

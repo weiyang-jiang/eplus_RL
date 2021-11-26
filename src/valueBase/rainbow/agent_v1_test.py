@@ -5,7 +5,7 @@
 import torch
 
 from Network_v1 import Network
-from valueBase.agent_test_main import Agent_test
+from valueBase.Asyn_agent_test_main import Agent_test
 
 
 

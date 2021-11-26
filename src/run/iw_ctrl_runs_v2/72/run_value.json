@@ -1,9 +1,11 @@
 {
+    "feature": "rainbow",
+    "process_raw_state_cmbd": "part1_v1",
     "lr": 6.5e-05,
     "adam_eps": 0.00015,
     "noise_net_std": 0.5,
     "history_size": 80000,
-    "hidden_size": 80000,
+    "hidden_size": 128,
     "device": "cpu",
     "method": "rainbow",
     "##########################强化学习环境名字": "###########################",
@@ -50,5 +52,5 @@
     "num_frames": 1500000,
     "seed": 777,
     "is_on_server": true,
-    "is_test": "iw_af4_3"
+    "is_test": "False"
 }

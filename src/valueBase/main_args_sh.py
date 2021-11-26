@@ -15,15 +15,14 @@ from valueBase.customized.reward_funcs import reward_func_dict, metric_func_dict
 from valueBase.customized.action_funcs import act_func_dict
 from valueBase.customized.raw_state_processors import raw_state_process_map
 from valueBase.customized.actions import action_map
-
-
+from valueBase.util.preprocessors import process_raw_state_cmbd_map
 
 LOG_LEVEL = 'DEBUG'
 LOG_FORMATTER = "[%(asctime)s] %(name)s %(levelname)s:%(message)s"
 
 def get_args():
     parser = argparse.ArgumentParser(description='Run Rainbow on EnergyPlus')
-    parser.add_argument('--env', default='Eplus-v1', help='EnergyPlus env name')
+    parser.add_argument('--env', nargs='+', default='Eplus-v1', help='EnergyPlus env name')
     parser.add_argument(
         '-o', '--output', default='.', help='Directory to save data to')
     parser.add_argument('--num_frames', default=15000000, type=int,
@@ -81,7 +80,9 @@ def get_args():
     parser.add_argument('--reward_func', default='cslDxCool_1', type=str)
     parser.add_argument('--metric_func', default='cslDxCool_1', type=str)
     parser.add_argument('--raw_state_process_func', default='cslDx_1', type=str)
+    parser.add_argument('--process_raw_state_cmbd', default='part1_v1', type=str)
     parser.add_argument('--feature', default=None, type=str)
+    parser.add_argument('--is_shuffle_envs', default="False", help='is_shuffle_envs', type=str)
 
     return parser
 
@@ -94,11 +95,9 @@ class ArgsMake(object):
         self.method = self._args.method.upper()
         self.feature = self._args.feature
         self.visual_main_path = self._args.visual_main_path
-        if not is_test_env:
-            spec = gym.spec(self._args.env)
-            self._env = spec.make(method=self.feature)
-
+        self.train_envs = self._args.env
         self.is_test = self._args.is_test
+        self.is_shuffle_envs = self._args.is_shuffle_envs
         self.lr = self._args.lr
         self.adam_eps = self._args.adam_eps
         self.history_size = self._args.history_size
@@ -124,6 +123,7 @@ class ArgsMake(object):
         self.eval_action_limits = act_func_dict[self._eval_action][1]
         self.raw_state_process_func = raw_state_process_map[self._raw_state_process][0]
         self.raw_stateLimit_process_func = raw_state_process_map[self._raw_state_process][1]
+        self.process_raw_state_cmbd = process_raw_state_cmbd_map[self._args.process_raw_state_cmbd]
         self.action_space = action_map[self._args.action_space]
         self.state_dim = self._args.state_dim
         self.e_weight = self._args.e_weight
@@ -132,14 +132,6 @@ class ArgsMake(object):
         self.window_len = self._args.window_len
         self.forecast_len = self._args.forecast_len
         self.test_envs = self._args.test_env
-
-        if not is_test_env:
-            self.env_interact_wrapper = IWEnvInteract(
-                env=self._env,
-                ob_state_process_func=self.raw_state_process_func,
-                action_space=self.action_space,
-                state_dim=self.state_dim
-            )
 
         self.rewardArgs = [self._args.rewardArgs]
 

@@ -6,8 +6,7 @@
 import os
 import time
 from typing import Tuple
-
-import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
 import gym
@@ -21,7 +20,7 @@ from valueBase.agent_test_main import Agent_test
 from valueBase.util.network import Network
 from valueBase.util.replaybuffer import *
 from valueBase.env_interaction import IWEnvInteract
-from valueBase.util.preprocessors import process_raw_state_cmbd, HistoryPreprocessor
+from valueBase.util.preprocessors import HistoryPreprocessor
 from valueBase.util.logger import Logger
 from valueBase.util.eps_scheduler import ActEpsilonScheduler
 from visualdl import LogWriter
@@ -79,6 +78,7 @@ class AgentMain(object):
             action_space,
             action_limits,
             metric_func,
+            process_raw_state_cmbd,
             RL_method,
             # test
             raw_state_process_func,
@@ -138,7 +138,8 @@ class AgentMain(object):
         self.raw_stateLimit_process_func = raw_stateLimit_process_func
         env_state_limits = raw_stateLimit_process_func(env.min_max_limits)
         self._raw_state_limits = np.transpose(np.copy(env_state_limits))
-
+        self.process_raw_state_cmbd = process_raw_state_cmbd
+        
         self.is_add_time_to_state = is_add_time_to_state
         self.obs_dim = env.observation_space.shape[0]  # 表示输入的state是几个的
         self.memory_size = memory_size
@@ -257,7 +258,8 @@ class AgentMain(object):
             "is_on_server": "True",
             "Noise net std": "None",
             "window_len": self.window_len,
-            "prcdState_dim": self.prcdState_dim
+            "prcdState_dim": self.prcdState_dim,
+            "process_raw_state_cmbd": self.process_raw_state_cmbd.__name__
         }
         self.str_time = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
         self.is_test = is_test
@@ -319,7 +321,7 @@ class AgentMain(object):
 
     def reset(self):
         time_this, state_raw, done = self.env.reset()  # 初始化环境参数
-        state = process_raw_state_cmbd(state_raw, [time_this],
+        state = self.process_raw_state_cmbd(state_raw, [time_this],
                                        self._env_st_yr, self._env_st_mn,
                                        self._env_st_dy, self._env_st_wd,
                                        self._pcd_state_limits, self.is_add_time_to_state)  # 1-D list
@@ -331,7 +333,7 @@ class AgentMain(object):
 
         time_next, next_state_raw, done = self.env.step(action)
 
-        next_state = process_raw_state_cmbd(next_state_raw, [time_next],
+        next_state = self.process_raw_state_cmbd(next_state_raw, [time_next],
                                             self._env_st_yr, self._env_st_mn,
                                             self._env_st_dy, self._env_st_wd,
                                             self._pcd_state_limits, self.is_add_time_to_state)  # 1-D list
@@ -393,7 +395,7 @@ class AgentMain(object):
             self.transition = [hist_state, action]  # 把当前的transition添加到列表当中去
 
             time_next, next_state_raw, done = self.env.step(action)  # 把预测出来的action代入到环境当中，得到下一步的状态和奖励
-            next_state = process_raw_state_cmbd(next_state_raw, [time_next],
+            next_state = self.process_raw_state_cmbd(next_state_raw, [time_next],
                                                 self._env_st_yr, self._env_st_mn,
                                                 self._env_st_dy, self._env_st_wd,
                                                 self._pcd_state_limits,
@@ -561,6 +563,7 @@ class AgentMain(object):
                 action_space=self.action_space,
                 action_limits=self.action_limits,
                 metric_func=self.metric_func,
+                process_raw_state_cmbd=self.process_raw_state_cmbd,
                 method=self.method,
 
                 window_len=self.window_len,

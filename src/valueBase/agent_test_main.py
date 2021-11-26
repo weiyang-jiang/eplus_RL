@@ -14,7 +14,7 @@ import torch
 
 
 from valueBase.util.network import Network
-from valueBase.util.preprocessors import process_raw_state_cmbd, HistoryPreprocessor
+from valueBase.util.preprocessors import HistoryPreprocessor
 from valueBase.util.logger import Logger
 
 LOG_LEVEL = 'INFO'
@@ -64,6 +64,7 @@ class Agent_test(object):
             action_space,
             action_limits,
             metric_func,
+            process_raw_state_cmbd,
             method,
 
             window_len=35,
@@ -115,7 +116,7 @@ class Agent_test(object):
         self._raw_state_limits = np.transpose(np.copy(env_state_limits))
         self.is_add_time_to_state = is_add_time_to_state
         self.obs_dim = env.observation_space.shape[0]
-
+        self.process_raw_state_cmbd = process_raw_state_cmbd
         if self.is_add_time_to_state == True:
             env_state_limits.insert(0, (0, 23))  # Add hour limit
             env_state_limits.insert(0, (0, 6))  # Add weekday limit
@@ -194,7 +195,7 @@ class Agent_test(object):
 
     def reset(self):
         time_this, state_raw, done = self.env.reset()  # 初始化环境参数
-        state = process_raw_state_cmbd(state_raw, [time_this],
+        state = self.process_raw_state_cmbd(state_raw, [time_this],
                                        self._env_st_yr, self._env_st_mn,
                                        self._env_st_dy, self._env_st_wd,
                                        self._pcd_state_limits, self.is_add_time_to_state)  # 1-D list
@@ -205,7 +206,7 @@ class Agent_test(object):
 
         time_next, next_state_raw, done = self.env.step(action)
 
-        next_state = process_raw_state_cmbd(next_state_raw, [time_next],
+        next_state = self.process_raw_state_cmbd(next_state_raw, [time_next],
                                             self._env_st_yr, self._env_st_mn,
                                             self._env_st_dy, self._env_st_wd,
                                             self._pcd_state_limits, self.is_add_time_to_state)  # 1-D list
@@ -242,7 +243,7 @@ class Agent_test(object):
             action = self.select_action(hist_state)
             # eplus
             time_next, next_state_raw, done = self.env.step(action)  # 把预测出来的action代入到环境当中，得到下一步的状态和奖励
-            next_state = process_raw_state_cmbd(next_state_raw, [time_next],
+            next_state = self.process_raw_state_cmbd(next_state_raw, [time_next],
                                                 self._env_st_yr, self._env_st_mn,
                                                 self._env_st_dy, self._env_st_wd,
                                                 self._pcd_state_limits,

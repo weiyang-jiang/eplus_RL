@@ -6,7 +6,7 @@ import torch
 from valueBase.category_DQN.C51Network import Network
 
 
-from valueBase.agent_test_main import Agent_test
+from valueBase.Asyn_agent_test_main import Agent_test
 
 
 class C51_Agent_test(Agent_test):

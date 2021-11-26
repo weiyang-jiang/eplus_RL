@@ -5,6 +5,7 @@
 
 import os, sys, glob
 
+
 from valueBase.rainbow.agent_v1_test import Rainbow_Agent_test
 
 srcPath = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -13,10 +14,8 @@ sys.path.append(srcPath)
 for src_path in src_list:
     sys.path.append(src_path)
 
-from tqdm import tqdm
-from typing import Dict
 
-import gym
+from typing import Dict
 
 import numpy as np
 import torch
@@ -26,15 +25,44 @@ from torch.nn.utils import clip_grad_norm_
 from PrioritizedReplayBuffer_v1 import PrioritizedReplayBuffer
 from ReplayBuffer_v1 import ReplayBuffer
 from Network_v1 import Network
-from valueBase.util.preprocessors import process_raw_state_cmbd
 
-from valueBase.agent_main import AgentMain
 
+from valueBase.Asyn_agent_main import AgentMain, AsynAgentMain
 
 class Rainbow_Agent(AgentMain):
-    
+
+    def select_action(self, state: np.array, epsilon, dqn) -> Dict:
+        """Select an action from the input state."""
+        # epsilon greedy policy
+        action_raw_idx = dqn(
+            torch.FloatTensor(state).to(self.device)
+        ).argmax()  # 把state值传入dqn神经网络中
+        action_raw_idx = action_raw_idx.detach().cpu().numpy()
+        action_raw_tup = self.action_space[action_raw_idx]
+
+        action_stpt_prcd, action_effect_idx = self.action_func(action_raw_tup, action_raw_idx, self._raw_state_limits,
+                                                               self.action_limits, state, self.local_logger,
+                                                               is_show_debug=False)
+        selected_action = action_stpt_prcd
+
+        return {self.env_name: selected_action}
+
+
+
+class AsynRainbow_Agent(AsynAgentMain):
+
+    def epsilon_update(self, frame_idx):
+        return self.epsilon
+
     def complie_agent(self):
+        self.agent = Rainbow_Agent
         self.Agent_test = Rainbow_Agent_test
+        self.memory = PrioritizedReplayBuffer(
+            self.hist_state_dim, self.memory_size, self.batch_size, alpha=self.alpha
+        )
+        self.memory_n = ReplayBuffer(
+            self.hist_state_dim, self.memory_size, self.batch_size, n_step=self.n_step, gamma=self.gamma
+        )
         # Categorical 1_DQN_relpayBuffer_target parameters
         self.support = torch.linspace(
             self.v_min, self.v_max, self.atom_size
@@ -60,28 +88,6 @@ class Rainbow_Agent(AgentMain):
 
         # optimizer
         self.optimizer = optim.Adam(self.dqn.parameters(), lr=self.lr, eps=self.eps)
-        # self.optimizer = optim.SGD(self.dqn.parameters(), lr=0.001)
-
-    def select_action(self, state: np.ndarray) -> np.ndarray:
-        """Select an action from the input state."""
-        # NoisyNet: no epsilon greedy action selection
-        # selected_action = self.dqn(
-        #     torch.FloatTensor(state).to(self.device)
-        # ).argmax()
-        # selected_action = selected_action.detach().cpu().numpy()
-
-        action_raw_idx = self.dqn(
-            torch.FloatTensor(state).to(self.device)
-        ).argmax()  # 把state值传入dqn神经网络中
-        action_raw_idx = action_raw_idx.detach().cpu().numpy()
-        action_raw_tup = self.action_space[action_raw_idx]
-
-        action_stpt_prcd, action_effect_idx = self.action_func(action_raw_tup, action_raw_idx, self._raw_state_limits,
-                                                               self.action_limits, state, self._local_logger,
-                                                               is_show_debug=False)
-        selected_action = action_stpt_prcd
-
-        return selected_action
 
     def update_model(self) -> torch.Tensor:
         """Update the model by gradient descent."""
@@ -123,139 +129,6 @@ class Rainbow_Agent(AgentMain):
         self.dqn_target.reset_noise()
 
         return loss.item()
-
-
-    def train(self, num_frames: int):
-
-        """Train the agent."""
-
-
-        self.add_hparams_dict["Number frames"] = num_frames
-        self.train_writer = self.complie_visual()
-        time_this, state, done = self.reset()  # 初始化环境参数
-        hist_state = self.histProcessor. \
-            process_state_for_network(state)  # 2-D array
-        self.hist_state_dim = hist_state.shape[1]
-        # PER
-        # memory for 1-step Learning
-        self.memory = PrioritizedReplayBuffer(
-            self.hist_state_dim, self.memory_size, self.batch_size, alpha=self.alpha
-        )
-
-        # memory for N-step Learning
-        self.memory_n = ReplayBuffer(
-            self.hist_state_dim, self.memory_size, self.batch_size, n_step=self.n_step, gamma=self.gamma
-        )
-        self.complie_dqn()
-
-        update_cnt = 0
-        # visual
-        epoch = 1
-        score = 0
-        scores = []
-        energy_total_eps = 0
-        comfort_total_eps = 0
-        this_ep_energy = 0
-        this_ep_comfort = 0
-
-        # eplus
-        iter_tqdm = tqdm(range(1, num_frames + 1))
-        for frame_idx in iter_tqdm:  # 开启训练
-            action = self.select_action(hist_state)  # 输入state输出一个action
-            iter_tqdm.set_description(f"{self.env_name}  cooling temp setpoint:{np.squeeze(action)}")
-
-            self.transition = [hist_state, action]  # 把当前的transition添加到列表当中去
-
-            time_next, next_state_raw, done = self.env.step(action)  # 把预测出来的action代入到环境当中，得到下一步的状态和奖励
-            next_state = process_raw_state_cmbd(next_state_raw, [time_next],
-                                                self._env_st_yr, self._env_st_mn,
-                                                self._env_st_dy, self._env_st_wd,
-                                                self._pcd_state_limits,
-                                                self.is_add_time_to_state)  # 1-D list
-            next_hist_state = self.histProcessor. \
-                process_state_for_network(next_state)  # 2-D array
-
-            # Process and normalize the raw observation
-
-            this_ep_reward = self.reward_func(state, action, next_state, self._pcd_state_limits,
-                                              self._e_weight, self._p_weight, *self.rewardArgs)
-            score += this_ep_reward
-
-            # visual
-            this_ep_energy, this_ep_comfort, iats, clgssp, htgssp = self.metric_func(next_state_raw, this_ep_energy, this_ep_comfort)
-
-            list_current = ["Action", "Temperature"]
-            self.write_data(self.train_writer, list_current, frame_idx,
-                            action[0], iats)
-
-
-
-            self.transition += [this_ep_reward, next_hist_state, done]  # 将整体的一个小的transition存储到大的list当中
-            # N-step transition
-
-            one_step_transition = self.memory_n.store(*self.transition)
-
-            # add a single step transition
-            if one_step_transition:
-                self.memory.store(*one_step_transition)
-
-            hist_state = next_hist_state
-
-            fraction = min(frame_idx / num_frames, 1.0)
-            self.beta = self.beta + fraction * (1.0 - self.beta)
-
-            # visual
-            comfort_total_eps += this_ep_comfort
-            energy_total_eps += this_ep_energy
-
-            # if episode ends
-            if done:
-                time_this, state, done = self.reset()  # 初始化环境参数
-                self.histProcessor.reset()
-                hist_state = self.histProcessor. \
-                    process_state_for_network(state)  # 2-D array
-                scores.append(score)
-                score = 0
-
-                # visual
-                score_plot = np.mean(scores) if len(scores) <= 4 else np.mean(scores[-4])
-                list_current = ["Score", "Energy", "Comfort"]
-                self.write_data(self.train_writer, list_current, epoch,
-                                score_plot, energy_total_eps, comfort_total_eps)
-                comfort_total_eps = 0
-                energy_total_eps = 0
-                epoch += 1
-
-            # if training is ready
-            if len(self.memory) >= self.history_size:  # 首先初始化一段时间，然replay_buffer里面有足够的数据。
-                if len(self.memory) == self.history_size:
-                    self._local_logger.debug("进入训练")
-                loss = self.update_model()  # 当初始化结束之后，开始更新模型
-                update_cnt += 1  # 记录一下开始更新参数的轮数
-
-                # linearly decrease epsilon
-                """
-                epsilon是用来决策探索率的超参数
-                epsilon的初始值是最大的为1,之后的参数在不断减小，一开始有很大的探索率，随着训练更新，探索率就要不断缩小。
-                """
-
-                # if hard update is needed
-                """
-                每隔target_update次就要更新一次target network
-                """
-                if update_cnt % self.target_update == 0:
-                    self.target_hard_update()
-
-                # visual
-                list_current = ["Loss"]
-                self.write_data(self.train_writer, list_current, update_cnt,
-                                loss)
-
-            # plotting
-
-        self.save_model()
-        self.env.close()
-
 
     def compute_dqn_loss_rainbow(self, samples: Dict[str, np.ndarray], gamma: float) -> torch.Tensor:
         """Return categorical dqn loss."""
@@ -304,5 +177,11 @@ class Rainbow_Agent(AgentMain):
 
         return elementwise_loss
 
+    def Prioritized(self, frame_idx, num_frames):
+        fraction = min(frame_idx / num_frames, 1.0)
+        self.beta = self.beta + fraction * (1.0 - self.beta)
 
-
+    def memory_func(self, transitions):
+        one_step_transition = [self.memory_n.store(*transition) for transition in transitions]
+        if one_step_transition[0]:
+            [self.memory.store(*transition) for transition in transitions]

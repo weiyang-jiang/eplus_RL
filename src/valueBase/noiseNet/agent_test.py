@@ -6,7 +6,7 @@
 
 import torch
 
-from valueBase.agent_test_main import Agent_test
+from valueBase.Asyn_agent_test_main import Agent_test
 from valueBase.noiseNet.noiseNetwork import Network
 
 
