@@ -1,5 +1,5 @@
 python ../../../../valueBase/main_run.py `# 训练执行文件(train main file)` \
---feature Asynrainbow_weiyangv1_35_newEP46_shuffle `# 此次训练的自定义特征名称：如使用rainbow方法采用rewardv1奖励时[rainbow_v1](The custom feature for this training)` \
+--feature rainbow_weiyangv1_35_newEP46_testv1 `# 此次训练的自定义特征名称：如使用rainbow方法采用rewardv1奖励时[rainbow_v1](The custom feature for this training)` \
 --method rainbow `# 此次训练的方法(Algorithm for this training)` \
 --process_raw_state_cmbd part1_v1 `# 正则化处理state的函数(normalized state function)` \
 --window_len 35 `# state的滑动窗口大小(state window length)` \
@@ -10,14 +10,14 @@ python ../../../../valueBase/main_run.py `# 训练执行文件(train main file)`
 --history_size 80000 `# 训练开始的步数(training start step)` \
 --noise_net_std 0.5 `# 噪声值(noise net std)` \
 --hidden_size 128 `# 隐藏层的大小(hidden layer size)` \
---env Part1-Light-Pit-Train-v1 Part1-Light-Pit-Test-v2 Part1-Light-Pit-Test-v3 `# 训练环境的名称(training environment name)` \
---device cpu `# 训练使用的设备名称(training device name)` \
+--env Part1-Light-Pit-Test-v1 `# 训练环境的名称(training environment name)` \
+--device cuda `# 训练使用的设备名称(training device name)` \
 --num_frames 1500000 `# 总的训练步数(total training steps)` \
 --reward_func part1_weiyang_v1 `# 奖励函数(reward function)` \
 --metric_func part1_v1 `# 评价函数(metric function)` \
 --eval_action_func cslDxActCool_1 `# 测试动作函数(eval action function)` \
 --action_space part1_v1 `# 动作的大小(action space)` \
---test_env Part1-Light-Pit-Test-v1 Part1-Light-Pit-Test-v2 Part1-Light-Pit-Test-v3 Part1-Light-Pit-Test-v4 `# 测试环境名称(test environment name)` \
+--test_env Part1-Light-Pit-Train-v1 Part1-Light-Pit-Test-v2 Part1-Light-Pit-Test-v3 Part1-Light-Pit-Test-v4 `# 测试环境名称(test environment name)` \
 --train_action_func cslDxActCool_1 `# 训练动作函数(train action function)` \
 --raw_state_process_func cslDx_1 `# state处理函数(state process function)` \
 --state_dim 71 `# 状态大小(state dimension)` \

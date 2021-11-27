@@ -40,14 +40,13 @@ class Rainbow_Agent(AgentMain):
         action_raw_idx = action_raw_idx.detach().cpu().numpy()
         action_raw_tup = self.action_space[action_raw_idx]
 
+
         action_stpt_prcd, action_effect_idx = self.action_func(action_raw_tup, action_raw_idx, self._raw_state_limits,
                                                                self.action_limits, state, self.local_logger,
                                                                is_show_debug=False)
         selected_action = action_stpt_prcd
 
         return {self.env_name: selected_action}
-
-
 
 class AsynRainbow_Agent(AsynAgentMain):
 

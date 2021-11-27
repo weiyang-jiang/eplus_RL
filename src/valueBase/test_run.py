@@ -6,6 +6,8 @@ import logging
 import os, sys, glob
 import time
 
+import tqdm
+
 dir_paths = glob.glob(os.path.dirname(__file__) + "/*")
 for dir_path_ in dir_paths:
     if os.path.isdir(dir_path_):
@@ -122,3 +124,5 @@ def test():
 
 if __name__ == '__main__':
     test()
+
+

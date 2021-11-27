@@ -60,7 +60,7 @@ class EplusEnv(Env):
     def __init__(self, eplus_path, weather_path, bcvtb_path, variable_path, idf_path, env_name,
                  min_max_limits, incl_forecast = False, forecastRandMode = 'normal', forecastRandStd = 0.15,
                  forecastSource = 'tmy3', forecastFilePath = None, forecast_hour = 12, act_repeat = 1,
-                 max_ep_data_store_num=5, method="rainbow", train_dir_path=None):
+                 max_ep_data_store_num=5, method="rainbow", train_dir_path=None, is_Asyn=False):
         self._env_name = env_name
         self.method = method
         self._thread_name = threading.current_thread().getName()
@@ -79,10 +79,16 @@ class EplusEnv(Env):
         port = sockname[1]        # Get the port number
         s.listen(60)                # Listen on request
         self.logger_main.debug('Socket is listening on host %s port %d'%(sockname))
+
+
         if train_dir_path == None:
             self._cwd_dir = self._get_eplus_working_folder(CWD, '-%s-%s-res'%(env_name, self.method))
         else:
             self._cwd_dir = train_dir_path
+
+        if is_Asyn:
+            self._cwd_dir = self._get_eplus_working_folder(self._cwd_dir, '-%s-%s-res' % (env_name, self.method))
+
         self._env_working_dir_parent = self._get_eplus_working_folder(self._cwd_dir, '-%s-res'%(env_name))
         os.makedirs(self._env_working_dir_parent)
         self._host = host
