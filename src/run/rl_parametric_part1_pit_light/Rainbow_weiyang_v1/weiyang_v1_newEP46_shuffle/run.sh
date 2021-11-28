@@ -10,7 +10,7 @@ python ../../../../valueBase/main_run.py `# 训练执行文件(train main file)`
 --history_size 80000 `# 训练开始的步数(training start step)` \
 --noise_net_std 0.5 `# 噪声值(noise net std)` \
 --hidden_size 128 `# 隐藏层的大小(hidden layer size)` \
---env Part1-Light-Pit-Train-v1 Part1-Light-Pit-Test-v2 Part1-Light-Pit-Test-v3 `# 训练环境的名称(training environment name)` \
+--env Part1-Light-Pit-Train-v1 Part1-Light-Pit-Test-v1 Part1-Light-Pit-Test-v3 `# 训练环境的名称(training environment name)` \
 --device cpu `# 训练使用的设备名称(training device name)` \
 --num_frames 1500000 `# 总的训练步数(total training steps)` \
 --reward_func part1_weiyang_v1 `# 奖励函数(reward function)` \
@@ -32,4 +32,4 @@ python ../../../../valueBase/main_run.py `# 训练执行文件(train main file)`
 --v_min -10.0 --v_max 10.0 --atom_size 51 `# C51算法的超参数(hyperparameters for C51)` \
 --seed 777 `# 随机种子(random seed)` \
 --is_on_server True --is_test False `# 此次执行是否为测试功能(is test or not)` \
---is_shuffle_envs False
+--is_shuffle_envs True

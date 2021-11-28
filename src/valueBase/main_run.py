@@ -19,7 +19,6 @@ for src_path in src_list:
 
 
 from main_args_sh import get_args
-from valueBase.util.Evaluation import ResultParser
 from valueBase.DQN_replayBuffer_target.agent import AsynDQNAgent
 from valueBase.DDQN_replayBuffer_target.agent import AsynDDQNAgent
 from valueBase.PQN.agent import AsynPQNAgent
@@ -33,7 +32,7 @@ from valueBase.n_step_DQN.agent import AsynNstep_Agent
 from valueBase.run_profile import RunProfileTrain
 from valueBase.Dueling_network.agent_il_v1 import DuelingAgent_v1
 from valueBase.Dueling_network.agent_il_v2 import DuelingAgent_v2
-
+from valueBase.rainbow.Asyn_agent_v1 import AsynAgentMainRainbow
 
 def run():
     parser = get_args()
@@ -63,6 +62,7 @@ def run():
         args.is_shuffle_envs = True
     else:
         args.is_shuffle_envs = False
+
     if method == "DQN":
         agent = AsynDQNAgent
     elif method == "DDQN":
@@ -79,6 +79,8 @@ def run():
         agent = AsynNstep_Agent
     elif method == "RAINBOW":
         agent = AsynRainbow_Agent
+    elif method == "ASYNRAINBOW":
+        agent = AsynAgentMainRainbow
     elif method == "ILPQNV1":
         agent = IL_PQNAgent_v1
     elif method == "ILPQNV2":
@@ -90,9 +92,8 @@ def run():
     else:
         logging.error("RL method is not exists.")
         return
-    dir_path = RunProfileTrain(agent=agent, args=args).run()
-    resultparser = ResultParser(dir_path)
-    resultparser.plot_result()
+    RunProfileTrain(agent=agent, args=args).run()
+
 
 if __name__ == '__main__':
     run()

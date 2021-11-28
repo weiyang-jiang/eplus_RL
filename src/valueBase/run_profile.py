@@ -2,11 +2,9 @@
    @Author: Weiyang Jiang
    @Date: 2021-11-19 00:26:22
 """
-import os
-import time
+
 
 import torch
-from tqdm import tqdm
 from visualdl import LogWriter
 from concurrent.futures import ThreadPoolExecutor
 from valueBase.main_args_sh import *
@@ -101,7 +99,7 @@ class RunProfileTrain(object):
         self.agent.train(self.args_make.num_frames)
         # agent.train(10000)
         self.agent.test()
-        return self.agent.dir_path
+
 
 
 class RunProfileTest(object):

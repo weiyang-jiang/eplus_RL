@@ -16,6 +16,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 from valueBase.Asyn_agent_test_main import Agent_test
+from valueBase.util import Evaluation
 from valueBase.util.network import Network
 from valueBase.util.replaybuffer import *
 from valueBase.env_interaction import IWEnvInteract
@@ -24,7 +25,7 @@ from valueBase.util.logger import Logger
 from valueBase.util.eps_scheduler import ActEpsilonScheduler
 from visualdl import LogWriter
 from valueBase.util.ResultEvaluation import ResultParser
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed, ThreadPoolExecutor
 
 
 LOG_LEVEL = 'INFO'
@@ -591,6 +592,7 @@ class AsynAgentMain(object):
                  for index, train_env in enumerate(train_envs)])
             action_info = {}
             [action_info.update(i.result()) for i in action_req]
+
             transitions = [[info[train_env][3], action_info[train_env]] for train_env in train_envs]
 
             next_req = as_completed([self.POOL_TRAIN.submit(self.agent_list[index].step, action_info[train_env], info[train_env][5])
@@ -769,6 +771,8 @@ class AsynAgentMain(object):
                                       metrics_list=self.list_main)
         self.train_writer.close()
         self.save_csv()
+        resultparser = Evaluation.ResultParser(self.dir_path)
+        resultparser.plot_result()
 
     def Prioritized(self, frame_idx, num_frames):
         pass

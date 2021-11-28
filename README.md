@@ -5,13 +5,18 @@ This is a project from DQN to Rainbow to control based on EnergyPlus.
 
 Run
 =======
-1. Modify src/eplus_env_v1/eplus_env/envs/eplus_models/\*/idf/\* schedule:file path to your own path. 
-   I create a "src/eplus_env_v1/eplus_env/envs/eplus_models/parse.py" file to do the multitasks(only need to change
+1. Modify src/eplus_env_v1/eplus_env/envs/eplus_models/\*/idf/\* schedule:file path to your own path. I create a "src/eplus_env_v1/eplus_env/envs/eplus_models/parse.py" file to do the multitasks(only need to change
    "main_path" to your own path.
 2. Use src/run to run the shell file of different environment.
 3. Each run contains train and test with different gym env.
 4. "src/run/parse_json.py" and "src/run/parse_sh.py" are used to do multitasks for modifying run_value.json and run.sh 
 5. "src/valueBase" contains DQN, DDQN, PQN, Target network, Dueling network, n step network, C51, rainbow which are value-based RL algorithms
+
+Update
+======
+1. Adding Asyncio for training and testing (cuda is better for training)
+2. Update ensemble reinforcement learning for training. Three training environment run concurrently to update one replaybuffer. This enhances robust determination for agent to
+   meet balance among three training environment. Details are in Asyn_agent_v1.py.
 
 
 

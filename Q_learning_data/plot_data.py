@@ -104,7 +104,7 @@ class ResultParser(object):
         self.plot_one_img(energy_saving=comfort_sum, features=features, env_list=self.env_list)
         plt.ylabel("Temperature Not Met (hrs)")
         plt.legend(loc="best")
-        plt.savefig(img_dir + f"/{self.model_type}_Energy_comfort_compare.png")
+        plt.savefig(img_dir + f"/{self.model_type}_Energy_comfort_compare_2.png")
         plt.show()
 
 
